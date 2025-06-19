@@ -181,18 +181,20 @@ async function preencher() {
       mes: month,
       dia: day,
     }
-    await store.dispatch('preencherSheet', form)
+    const done = await store.dispatch('preencherSheet', form)
 
-    ph.value = null
-    num_banhistas.value = 0
-    horas.value = null
-    temperatura_agua.value = 0
-    residual_desinfetante.value = null
-    total_residual.value = null
-    transparencia.value = null
-    volume.value = 0
-    lavagem_filtros.value = null
-    observacoes.value = ''
+    if (done) {
+      ph.value = null
+      num_banhistas.value = 0
+      horas.value = null
+      temperatura_agua.value = 0
+      residual_desinfetante.value = null
+      total_residual.value = null
+      transparencia.value = null
+      volume.value = 0
+      lavagem_filtros.value = null
+      observacoes.value = ''
+    }
   } else {
     alert('Formulário mal preenchido!')
   }
