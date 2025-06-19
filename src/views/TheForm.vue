@@ -28,7 +28,7 @@
         />
       </div>
       <div class="input">
-        <label for="">Total Residual</label>
+        <label for="">Total Desinfetante</label>
         <input
           :class="[total_residual === '' ? 'input-erro' : '']"
           type="number"
@@ -182,6 +182,18 @@ function preencher() {
       dia: day,
     }
     store.dispatch('preencherSheet', form)
+    setTimeout(() => {
+      ph.value = null
+      num_banhistas.value = 0
+      horas.value = null
+      temperatura_agua.value = 0
+      residual_desinfetante.value = null
+      total_residual.value = null
+      transparencia.value = null
+      volume.value = 0
+      lavagem_filtros.value = null
+      observacoes.value = ''
+    }, 50)
   } else {
     alert('Formulário mal preenchido!')
   }
