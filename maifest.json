@@ -1,0 +1,16 @@
+{
+  "name": "Piscina",
+  "short_name": "Piscina",
+  "description": "A modern app",
+  "start_url": "/Piscina/",
+  "display": "standalone",
+  "background_color": "#181818",
+  "theme_color": "#181818",
+  "icons": [
+    {
+      "src": "image.ico",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
