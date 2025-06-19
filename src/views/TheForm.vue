@@ -181,9 +181,10 @@ async function preencher() {
       mes: month,
       dia: day,
     }
-    const done = await store.dispatch('preencherSheet', form)
+    try {
+      await store.dispatch('preencherSheet', form) // espera que termine
 
-    if (done) {
+      // só depois limpa os campos
       ph.value = null
       num_banhistas.value = 0
       horas.value = null
@@ -194,6 +195,9 @@ async function preencher() {
       volume.value = 0
       lavagem_filtros.value = null
       observacoes.value = ''
+    } catch (error) {
+      alert('Erro ao preencher a planilha')
+      console.error(error)
     }
   } else {
     alert('Formulário mal preenchido!')
