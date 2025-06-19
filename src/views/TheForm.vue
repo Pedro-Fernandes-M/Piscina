@@ -151,7 +151,7 @@ const validade = computed(() => {
   )
 })
 
-function preencher() {
+async function preencher() {
   const hoje = new Date()
   let hours = hoje.getHours()
   let minutes = hoje.getMinutes()
@@ -181,19 +181,18 @@ function preencher() {
       mes: month,
       dia: day,
     }
-    store.dispatch('preencherSheet', form)
-    setTimeout(() => {
-      ph.value = null
-      num_banhistas.value = 0
-      horas.value = null
-      temperatura_agua.value = 0
-      residual_desinfetante.value = null
-      total_residual.value = null
-      transparencia.value = null
-      volume.value = 0
-      lavagem_filtros.value = null
-      observacoes.value = ''
-    }, 50)
+    await store.dispatch('preencherSheet', form)
+
+    ph.value = null
+    num_banhistas.value = 0
+    horas.value = null
+    temperatura_agua.value = 0
+    residual_desinfetante.value = null
+    total_residual.value = null
+    transparencia.value = null
+    volume.value = 0
+    lavagem_filtros.value = null
+    observacoes.value = ''
   } else {
     alert('Formulário mal preenchido!')
   }
