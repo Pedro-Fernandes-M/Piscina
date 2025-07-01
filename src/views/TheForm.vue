@@ -171,7 +171,7 @@ const aviso = computed(() => {
     formatDecimal(residual_desinfetante.value) < 2.5 &&
     formatDecimal(total_residual.value) > 0 &&
     formatDecimal(total_residual.value) < 3 &&
-    formatDecimal(total_residual.value) != formatDecimal(residual_desinfetante.value)
+    formatDecimal(total_residual.value) >= formatDecimal(residual_desinfetante.value)
   )
 })
 
