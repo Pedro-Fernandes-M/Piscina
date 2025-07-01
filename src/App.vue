@@ -1,6 +1,11 @@
 <script setup>
 import { RouterView } from 'vue-router'
+import { useStore } from 'vuex'
+import router from './router'
+import { ref } from 'vue'
 
+const store = useStore()
+/* 
 document.addEventListener('contextmenu', (event) => event.preventDefault())
 
 // Disable F12, Ctrl+Shift+I
@@ -49,41 +54,81 @@ function stopApp() {
 }
 
 // Call the detection function
-detectDevTools()
+detectDevTools() */
+
+const touchStartX = ref(0)
+const touchEndX = ref(0)
+
+const onTouchStart = (e) => {
+  touchStartX.value = e.changedTouches[0].screenX
+}
+
+const onTouchEnd = (e) => {
+  touchEndX.value = e.changedTouches[0].screenX
+  if (touchStartX.value - touchEndX.value > 200) {
+    if (store.getters.getPage === 'home') {
+      store.commit('setPage', 'table')
+      router.push('/')
+    } else {
+      store.commit('setPage', 'home')
+      router.push('/table')
+    }
+  }
+}
 </script>
 
 <template>
-  <RouterView />
+  <router-view v-slot="{ Component }">
+    <transition name="fade-slide" mode="out-in">
+      <component :is="Component" @touchstart="onTouchStart" @touchend="onTouchEnd" />
+    </transition>
+  </router-view>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+<style>
+.fade-slide-enter-active {
+  animation: fadeSlideIn 400ms ease forwards;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
+.fade-slide-leave-active {
+  animation: fadeSlideOut 400ms ease backwards;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
+/* Keyframes para entrada */
+@keyframes fadeSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateX(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
+/* Keyframes para saída */
+@keyframes fadeSlideOut {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateX(-30px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
 }
 </style>

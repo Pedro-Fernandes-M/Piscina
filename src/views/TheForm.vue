@@ -1,15 +1,11 @@
 <template>
   <div class="page">
-    <form action="">
+    <form action="" class="form">
       <div class="center">
         <h2 @click="mudarSheet">
           {{ piscina }}
         </h2>
         <h3>{{ day }} de {{ month }}</h3>
-      </div>
-      <div class="input">
-        <label for="ph">PH</label>
-        <input :class="[ph === '' ? 'input-erro' : '']" type="number" v-model="ph" />
       </div>
       <div class="input">
         <label for="">Temperatura Água</label>
@@ -34,6 +30,10 @@
           type="number"
           v-model="total_residual"
         />
+      </div>
+      <div class="input">
+        <label for="ph">PH</label>
+        <input :class="[ph === '' ? 'input-erro' : '']" type="number" v-model="ph" />
       </div>
       <div class="input">
         <label for="">Transparência</label>
@@ -79,14 +79,21 @@
       </div>
       <button @click.prevent="preencher" type="submit">Preencher</button>
     </form>
+    <SpinnerCard v-if="spinner"></SpinnerCard>
   </div>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
+import SpinnerCard from '@/components/SpinnerCard.vue'
 
 const store = useStore()
+
+const spinner = computed(() => {
+  return store.getters.getSpinner
+})
+
 const day = new Date().getDate()
 const monthNames = [
   'Janeiro',
@@ -126,12 +133,17 @@ function mudarSheet() {
   }
 }
 
+function formatDecimal(val) {
+  const n = String(val).replace(',', '.')
+  return n.startsWith('.') ? '0' + n : n
+}
+
 const validade = computed(() => {
   const n = Number(num_banhistas.value)
-  const ph_c = Number(String(ph.value).replace(',', '.'))
-  const temp = Number(String(temperatura_agua.value).replace(',', '.'))
-  const desi = Number(String(residual_desinfetante.value).replace(',', '.'))
-  const total = Number(String(total_residual.value).replace(',', '.'))
+  const ph_c = Number(String(ph.value).replace(',', '.')) //entre 5 a 10
+  const temp = Number(String(temperatura_agua.value).replace(',', '.')) //
+  const desi = Number(formatDecimal(residual_desinfetante.value)) // 0 e 2.5
+  const total = Number(formatDecimal(total_residual.value)) // entre 0 e 3
   const vol = Number(String(volume.value).replace(',', '.'))
 
   const numValido = !isNaN(n) && n >= 0 && Number.isInteger(n)
@@ -151,6 +163,18 @@ const validade = computed(() => {
   )
 })
 
+const aviso = computed(() => {
+  return (
+    ph.value < 10 &&
+    ph.value > 5 &&
+    formatDecimal(residual_desinfetante.value) > 0 &&
+    formatDecimal(residual_desinfetante.value) < 2.5 &&
+    formatDecimal(total_residual.value) > 0 &&
+    formatDecimal(total_residual.value) < 3 &&
+    formatDecimal(total_residual.value) != formatDecimal(residual_desinfetante.value)
+  )
+})
+
 async function preencher() {
   const hoje = new Date()
   let hours = hoje.getHours()
@@ -167,24 +191,39 @@ async function preencher() {
     transparencia.value != null &&
     lavagem_filtros.value != null
   ) {
-    const form = {
-      horas: horas,
-      ph: ph,
-      num_banhistas: num_banhistas,
-      transparencia: transparencia,
-      temperatura_agua: temperatura_agua,
-      residual_desinfetante: residual_desinfetante,
-      total_residual: total_residual,
-      volume: volume,
-      lavagem_filtros: lavagem_filtros,
-      observacoes: observacoes,
-      mes: month,
-      dia: day,
+    if (!aviso.value) {
+      if (confirm('Alguns valores encontram-se fora dos limites comuns pretende prosseguir?')) {
+        write()
+      } else {
+        return
+      }
+    } else {
+      write()
     }
-    try {
-      await store.dispatch('preencherSheet', form) // espera que termine
+  } else {
+    alert('Formulário mal preenchido!')
+  }
+}
 
-      // só depois limpa os campos
+async function write() {
+  const form = {
+    horas: horas,
+    ph: ph,
+    num_banhistas: num_banhistas,
+    transparencia: transparencia,
+    temperatura_agua: temperatura_agua,
+    residual_desinfetante: formatDecimal(residual_desinfetante.value),
+    total_residual: formatDecimal(total_residual.value),
+    volume: volume,
+    lavagem_filtros: lavagem_filtros,
+    observacoes: observacoes,
+    mes: month,
+    dia: day,
+  }
+  try {
+    const response = await store.dispatch('preencherSheet', form) // espera que termine
+
+    if (response.status === 200) {
       ph.value = null
       num_banhistas.value = 0
       horas.value = null
@@ -195,42 +234,24 @@ async function preencher() {
       volume.value = 0
       lavagem_filtros.value = null
       observacoes.value = ''
-    } catch (error) {
-      alert('Erro ao preencher a planilha')
-      console.error(error)
+    } else {
+      alert('Erro ao preencher a planilha, tente submeter de novo.')
     }
-  } else {
-    alert('Formulário mal preenchido!')
+  } catch (error) {
+    alert('Erro ao preencher a planilha, tente submeter de novo.')
+    console.error(error)
   }
 }
 </script>
 
 <style scoped>
-.page {
-  margin: 2rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100dvh;
-}
-
-form {
-  background-color: #3a3a3a;
-  padding: 30px 40px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  width: 300px;
-}
-
 .center {
   text-align: center;
 }
 
 h2 {
   color: aliceblue;
+  font-weight: 1000;
 }
 
 .input {
