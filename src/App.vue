@@ -65,7 +65,7 @@ const onTouchStart = (e) => {
 
 const onTouchEnd = (e) => {
   touchEndX.value = e.changedTouches[0].screenX
-  if (touchStartX.value - touchEndX.value > 200 || touchEndX.value - touchStartX.value > 200) {
+  if (touchStartX.value - touchEndX.value > 150 || touchEndX.value - touchStartX.value > 150) {
     if (store.getters.getPage === 'home') {
       store.commit('setPage', 'table')
       router.push('/')
