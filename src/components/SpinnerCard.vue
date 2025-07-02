@@ -1,10 +1,14 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper" @dblclick="store.commit('setSpinner', false)">
     <div class="spinner" />
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import { useStore } from 'vuex'
+
+const store = useStore()
+</script>
 
 <style scoped>
 .spinner {

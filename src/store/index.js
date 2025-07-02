@@ -205,9 +205,11 @@ const store = createStore({
             localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
           }
         } else {
-          const newToken = await dispatch('solicitarToken')
-          commit('setGoogleCredential', newToken)
-          localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+          if (confirm('Pretende fazer login?')) {
+            const newToken = await dispatch('solicitarToken')
+            commit('setGoogleCredential', newToken)
+            localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+          }
         }
       }
 
