@@ -128,6 +128,7 @@ function deleteLog(index) {
   font-size: 16px;
   cursor: pointer;
   transition: background 0.2s ease;
+  margin: 2rem;
 }
 .text {
   font-weight: 1000;
