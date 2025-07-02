@@ -8,6 +8,7 @@ const store = createStore({
     page: 'home',
     tabela: [],
     spinner: false,
+    linhas: [],
   },
   getters: {
     getGoogleCredential(state) {
@@ -25,6 +26,9 @@ const store = createStore({
     getSpinner(state) {
       return state.spinner
     },
+    getLinhas(state) {
+      return state.linhas
+    },
   },
   mutations: {
     setGoogleCredential(state, token) {
@@ -41,6 +45,9 @@ const store = createStore({
     },
     setSpinner(state, payload) {
       state.spinner = payload
+    },
+    setLinhas(state, payload) {
+      state.linhas = payload
     },
   },
   actions: {
@@ -63,8 +70,26 @@ const store = createStore({
     },
     async preencherSheet({ getters, dispatch, commit }, payload) {
       commit('setSpinner', !getters.getSpinner)
-      if (getters.getGoogleCredential == null) {
-        commit('setGoogleCredential', await dispatch('solicitarToken'))
+
+      if (getters.getGoogleCredential === null) {
+        const storedToken = localStorage.getItem('token')
+
+        if (storedToken) {
+          const parsedToken = JSON.parse(storedToken)
+          const isValid = Date.now() - parsedToken.time < 3590 * 1000
+
+          if (isValid) {
+            commit('setGoogleCredential', parsedToken.access)
+          } else {
+            const newToken = await dispatch('solicitarToken')
+            commit('setGoogleCredential', newToken)
+            localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+          }
+        } else {
+          const newToken = await dispatch('solicitarToken')
+          commit('setGoogleCredential', newToken)
+          localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+        }
       }
 
       const apiKey = import.meta.env.VITE_API_KEY
@@ -163,10 +188,29 @@ const store = createStore({
       }
     },
     async lerPlanilha({ getters, commit, dispatch }, payload) {
-      commit('setSpinner', !getters.getSpinner)
-      if (getters.getGoogleCredential == null) {
-        commit('setGoogleCredential', await dispatch('solicitarToken'))
+      commit('setSpinner', true)
+
+      if (getters.getGoogleCredential === null) {
+        const storedToken = localStorage.getItem('token')
+
+        if (storedToken) {
+          const parsedToken = JSON.parse(storedToken)
+          const isValid = Date.now() - parsedToken.time < 3590 * 1000
+
+          if (isValid) {
+            commit('setGoogleCredential', parsedToken.access)
+          } else {
+            const newToken = await dispatch('solicitarToken')
+            commit('setGoogleCredential', newToken)
+            localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+          }
+        } else {
+          const newToken = await dispatch('solicitarToken')
+          commit('setGoogleCredential', newToken)
+          localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+        }
       }
+
       const apiKey = import.meta.env.VITE_API_KEY
       const spreadsheetId =
         store.getters.getPiscina === 'Piscina Interior'
@@ -207,10 +251,9 @@ const store = createStore({
           alert('Não encontrou linhas para o dia')
           commit('setSpinner', !getters.getSpinner)
           return { status: 400 }
+        } else {
+          commit('setLinhas', linhasTotais)
         }
-
-        // Monta o range para ler as 4 linhas completas (por exemplo colunas A até Z, ajusta conforme necessário)
-        // Ajusta o intervalo conforme o que precisas ler, aqui exemplo A até Z (colunas 1-26)
 
         const range = `${payload.mes}!F${linhasTotais[0]}:P${linhasTotais[linhasTotais.length - 1]}`
 
@@ -222,14 +265,79 @@ const store = createStore({
         if (response.status === 200) {
           const dadosLinhas = response.result.values || []
           commit('setTabela', dadosLinhas)
+          if (store.getters.getPiscina === 'Piscina Interior') {
+            localStorage.setItem('logs', JSON.stringify(dadosLinhas))
+          } else {
+            localStorage.setItem('logs1', JSON.stringify(dadosLinhas))
+          }
         } else {
           alert(response.status)
         }
         commit('setSpinner', !getters.getSpinner)
       } catch (error) {
-        console.error('Erro ao ler dados do Sheets:', error)
+        alert('Erro ao ler dados do Sheets:', error)
         commit('setSpinner', !getters.getSpinner)
         return { status: 500, error }
+      }
+    },
+    async deleteLog({ getters, commit, dispatch }, payload) {
+      commit('setSpinner', !getters.getSpinner)
+
+      if (getters.getGoogleCredential === null) {
+        const storedToken = localStorage.getItem('token')
+
+        if (storedToken) {
+          const parsedToken = JSON.parse(storedToken)
+          const isValid = Date.now() - parsedToken.time < 3590 * 1000
+
+          if (isValid) {
+            commit('setGoogleCredential', parsedToken.access)
+          } else {
+            const newToken = await dispatch('solicitarToken')
+            commit('setGoogleCredential', newToken)
+            localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+          }
+        } else {
+          const newToken = await dispatch('solicitarToken')
+          commit('setGoogleCredential', newToken)
+          localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+        }
+      }
+
+      const apiKey = import.meta.env.VITE_API_KEY
+      const spreadsheetId =
+        store.getters.getPiscina === 'Piscina Interior'
+          ? import.meta.env.VITE_SPREADSHEET_ID
+          : import.meta.env.VITE_SPREADSHEET_ID_1
+      // Inicializa gapi client
+      await new Promise((resolve) => gapi.load('client', resolve))
+      await gapi.client.init({
+        apiKey: apiKey,
+        discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+      })
+
+      const linha = getters.getLinhas[payload.index] // Número da linha real na planilha (1-based)
+      const range = `${payload.mes}!F${linha}:P${linha}` // Apagar colunas F a P nessa linha
+
+      try {
+        await gapi.client.sheets.spreadsheets.values.update({
+          spreadsheetId: spreadsheetId,
+          range: range,
+          valueInputOption: 'RAW',
+          resource: {
+            values: [['', '', '', '', '', '', '', '', '', '', '']], // 11 colunas de F a P
+          },
+        })
+
+        alert(`Linha ${linha} limpa com sucesso!`)
+
+        try {
+          await dispatch('lerPlanilha', { mes: payload.mes, dia: payload.dia })
+        } catch (error) {
+          alert('Erro ao ler linha:', error)
+        }
+      } catch (error) {
+        alert('Erro ao apagar linha:', error)
       }
     },
   },

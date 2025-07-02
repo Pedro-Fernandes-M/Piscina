@@ -7,22 +7,28 @@
         </h2>
         <h3>{{ day }} de {{ month }}</h3>
       </div>
-      <div v-if="rows.length > 0">
-        <div v-for="item in rows" :key="rows.indexOf(item)" class="grid">
+      <div v-if="rows">
+        <div v-for="(item, index) in rows" :key="index" class="grid">
           <span class="grid1">{{ item[0] }}</span>
-          <span v-for="(data, index) in item.slice(1, item.length - 1)" :key="index">
+          <span v-for="(data, index1) in item.slice(1, item.length - 1)" :key="index1">
             <span class="weight">
-              {{ header[index] }}
+              {{ header[index1] }}
             </span>
             <br />
             {{ data == '' ? '--' : data }}
           </span>
           <span class="grid1">{{ item[item.length - 1] }}</span>
+          <button class="button" @click="deleteLog(index)">
+            <div class="forma">
+              <IconTrash />
+            </div>
+          </button>
         </div>
+        <div v-if="rows.length === 0" class="center">Sem registos neste dia!</div>
       </div>
       <div v-else class="center">Sem dados</div>
     </div>
-    <button @click="lerDados">Refresh</button>
+    <button @click="lerDados" class="button1">Refresh</button>
     <SpinnerCard v-if="spinner"></SpinnerCard>
   </div>
 </template>
@@ -31,6 +37,7 @@
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import SpinnerCard from '@/components/SpinnerCard.vue'
+import IconTrash from '@/components/icons/IconTrash.vue'
 
 const store = useStore()
 
@@ -57,12 +64,22 @@ const monthNames = [
   'Dezembro',
 ]
 const month = monthNames[new Date().getMonth()]
+store.dispatch('lerPlanilha', {
+  dia: day,
+  mes: month,
+})
 
 const header = ref(['Ph', 'Temp.', 'Residual', 'Total', 'Transp.', 'Nº', 'Vol', 'Filtros'])
 const rows = computed(() => {
   const values = []
-  for (let i = 0; i < store.getters.getTabela.length; i++) {
-    values.push(store.getters.getTabela[i])
+  if (store.getters.getTabela.length > 0) {
+    for (let i = 0; i < store.getters.getTabela.length; i++) {
+      values.push(store.getters.getTabela[i])
+    }
+  } else if (store.getters.getPiscina === 'Piscina Interior') {
+    return JSON.parse(localStorage.getItem('logs'))
+  } else {
+    return JSON.parse(localStorage.getItem('logs1'))
   }
   return values
 })
@@ -79,17 +96,29 @@ function mudarSheet() {
   if (piscina.value === 'Piscina Interior') {
     store.commit('setPiscina', 'Piscina Exterior')
     store.commit('setTabela', [])
+    if (localStorage.getItem('logs1') === null) {
+      store.dispatch('lerPlanilha', {
+        dia: day,
+        mes: month,
+      })
+    }
   } else {
     store.commit('setPiscina', 'Piscina Interior')
     store.commit('setTabela', [])
   }
 }
+
+function deleteLog(index) {
+  if (confirm('Pretende apagar o registo?')) {
+    store.dispatch('deleteLog', { mes: month, index: index, dia: day })
+  } else {
+    return
+  }
+}
 </script>
 
 <style scoped>
-button {
-  margin: 2rem;
-  margin-top: 1rem;
+.button1 {
   padding: 10px 20px;
   background-color: #00bcd4;
   color: white;
@@ -116,16 +145,51 @@ button {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto auto;
   gap: 6px;
-  margin-bottom: 3rem;
+  margin-bottom: 0.5rem;
 }
 .grid1 {
   grid-column: 1 / span 2;
   font-weight: 900;
   color: aliceblue;
-  margin: 0.5rem;
+  margin-top: 0.5rem;
 }
+.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  grid-column: 1 / span 2;
+  padding: 0.5rem 1rem;
+  margin: 0 1.5rem 1.5rem;
+  height: 2rem;
+  background-color: #e74c3c;
+  font-weight: 500;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
+}
+
+.button:hover {
+  background-color: #c0392b;
+  transform: translateY(-1px);
+}
+
+.button:active {
+  transform: translateY(0);
+  background-color: #a93226;
+}
+
 .weight {
   font-weight: 500;
   color: aliceblue;
+}
+.forma {
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  width: 1.2rem;
+  height: 0.6rem;
 }
 </style>

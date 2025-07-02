@@ -2,7 +2,7 @@
 import { RouterView } from 'vue-router'
 import { useStore } from 'vuex'
 import router from './router'
-import { ref } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 
 const store = useStore()
 /* 
@@ -75,6 +75,13 @@ const onTouchEnd = (e) => {
     }
   }
 }
+
+function clearStorage() {
+  localStorage.removeItem('logs')
+  localStorage.removeItem('logs1')
+}
+
+onBeforeMount(clearStorage)
 </script>
 
 <template>
