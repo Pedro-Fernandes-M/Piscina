@@ -88,6 +88,7 @@ async function lerDados() {
   const input = {
     dia: day,
     mes: month,
+    btn: true,
   }
   await store.dispatch('lerPlanilha', input)
 }

@@ -205,10 +205,14 @@ const store = createStore({
             localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
           }
         } else {
-          if (confirm('Pretende fazer login?')) {
+          if (payload.btn === true) {
             const newToken = await dispatch('solicitarToken')
             commit('setGoogleCredential', newToken)
             localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+          } else {
+            alert('Sem login! Efetue login manualmente no botão')
+            commit('setSpinner', false)
+            return
           }
         }
       }
