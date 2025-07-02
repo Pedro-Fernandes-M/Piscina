@@ -190,7 +190,7 @@ function deleteLog(index) {
   display: flex;
   align-items: center;
   justify-items: center;
-  width: 1.2rem;
-  height: 0.6rem;
+  min-width: 1.2rem;
+  min-height: 0.6rem;
 }
 </style>
