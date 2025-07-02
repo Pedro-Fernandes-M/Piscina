@@ -5,7 +5,7 @@ import router from './router'
 import { onBeforeMount, ref } from 'vue'
 
 const store = useStore()
-/* 
+
 document.addEventListener('contextmenu', (event) => event.preventDefault())
 
 // Disable F12, Ctrl+Shift+I
@@ -54,7 +54,7 @@ function stopApp() {
 }
 
 // Call the detection function
-detectDevTools() */
+detectDevTools()
 
 const touchStartX = ref(0)
 const touchEndX = ref(0)
