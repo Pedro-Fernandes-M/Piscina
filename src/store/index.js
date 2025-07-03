@@ -234,7 +234,7 @@ const store = createStore({
             commit('setGoogleCredential', newToken)
             localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
           } else {
-            alert('Sem login efetuado! \n Efetue login manualmente no botão Refresh.')
+            alert('Sem login efetuado! \nEfetue login manualmente no botão Refresh.')
             commit('setSpinner', false)
             return
           }

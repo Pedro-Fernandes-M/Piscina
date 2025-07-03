@@ -143,6 +143,7 @@ function deleteLog(index) {
   width: 70%;
 }
 .btn {
+  width: 100%;
   margin-bottom: 2rem;
   display: flex;
   justify-content: center;
