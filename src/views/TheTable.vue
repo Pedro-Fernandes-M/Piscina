@@ -7,28 +7,40 @@
         </h2>
         <h3>{{ day }} de {{ month }}</h3>
       </div>
-      <div v-if="rows">
-        <div v-for="(item, index) in rows" :key="index" class="grid">
-          <span class="grid1">{{ item[0] }}</span>
-          <span v-for="(data, index1) in item.slice(1, item.length - 1)" :key="index1">
-            <span class="weight">
-              {{ header[index1] }}
+      <div v-if="rows" class="gap">
+        <div v-for="(item, index) in rows" :key="index">
+          <div v-if="item.length > 0" class="grid">
+            <span class="grid1">
+              <span class="font"> Hora </span>
+              <br />
+              {{ item[0] }}
             </span>
-            <br />
-            {{ data == '' ? '--' : data }}
-          </span>
-          <span class="grid1">{{ item[item.length - 1] }}</span>
-          <button class="button" @click="deleteLog(index)">
-            <div class="forma">
-              <IconTrash />
-            </div>
-          </button>
+            <span v-for="(data, index1) in item.slice(1, item.length - 1)" :key="index1">
+              <span class="weight">
+                {{ header[index1] }}
+              </span>
+              <br />
+              {{ data == '' ? '--' : data }}
+            </span>
+            <span class="grid1">
+              <span class="font"> Responsável </span>
+              <br />
+              {{ item[item.length - 1] }}
+            </span>
+            <button class="button" @click="deleteLog(index)">
+              <div class="forma">
+                <IconTrash />
+              </div>
+            </button>
+          </div>
         </div>
         <div v-if="rows.length === 0" class="center">Sem registos neste dia!</div>
       </div>
       <div v-else class="center">Sem dados</div>
     </div>
-    <button @click="lerDados" class="button1">Refresh</button>
+    <div class="btn">
+      <button @click="lerDados" class="button1">Refresh</button>
+    </div>
     <SpinnerCard v-if="spinner"></SpinnerCard>
   </div>
 </template>
@@ -69,7 +81,7 @@ store.dispatch('lerPlanilha', {
   mes: month,
 })
 
-const header = ref(['Ph', 'Temp.', 'Residual', 'Total', 'Transp.', 'Nº', 'Vol', 'Filtros'])
+const header = ref(['Ph', 'Temp.', 'Residual', 'Total', 'Transp.', 'N.º', 'Vol.', 'Filtros'])
 const rows = computed(() => {
   const values = []
   if (store.getters.getTabela.length > 0) {
@@ -110,7 +122,7 @@ function mudarSheet() {
 }
 
 function deleteLog(index) {
-  if (confirm('Pretende apagar o registo?')) {
+  if (confirm(`Pretende apagar o registo da planilha - ${store.getters.getPiscina}?`)) {
     store.dispatch('deleteLog', { mes: month, index: index, dia: day })
   } else {
     return
@@ -128,8 +140,15 @@ function deleteLog(index) {
   font-size: 16px;
   cursor: pointer;
   transition: background 0.2s ease;
-  margin: 2rem;
+  width: 70%;
 }
+.btn {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .text {
   font-weight: 1000;
   color: aliceblue;
@@ -146,12 +165,11 @@ function deleteLog(index) {
   text-align: center;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto auto;
-  gap: 6px;
-  margin-bottom: 0.5rem;
+  gap: 5px;
+  border-top: dashed whitesmoke 1.2px;
 }
 .grid1 {
   grid-column: 1 / span 2;
-  font-weight: 900;
   color: aliceblue;
   margin-top: 0.5rem;
 }
@@ -161,7 +179,10 @@ function deleteLog(index) {
   align-items: center;
   grid-column: 1 / span 2;
   padding: 0.5rem 1rem;
-  margin: 0 1.5rem 1.5rem;
+  margin-top: 0.5rem;
+  margin-right: 2.2rem;
+  margin-left: 2.2rem;
+  margin-bottom: 0.5rem;
   height: 2rem;
   background-color: #e74c3c;
   font-weight: 500;
@@ -187,9 +208,18 @@ function deleteLog(index) {
   font-weight: 500;
   color: aliceblue;
 }
+
+.font {
+  font-weight: 900;
+  color: aliceblue;
+}
 .forma {
   display: flex;
   align-items: center;
   justify-items: center;
+}
+.gap {
+  display: grid;
+  gap: 0.8rem;
 }
 </style>

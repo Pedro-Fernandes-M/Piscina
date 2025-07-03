@@ -62,7 +62,7 @@
         <input :class="[volume === '' ? 'input-erro' : '']" type="number" v-model="volume" />
       </div>
       <div class="input">
-        <label for="num">Nº Banhistas</label>
+        <label for="num">N.º Banhistas</label>
         <input
           :class="[num_banhistas === '' ? 'input-erro' : '']"
           type="number"
@@ -176,32 +176,36 @@ const aviso = computed(() => {
 })
 
 async function preencher() {
-  const hoje = new Date()
-  let hours = hoje.getHours()
-  let minutes = hoje.getMinutes()
-  hours = String(hours).padStart(2, '0')
-  minutes = String(minutes).padStart(2, '0')
-  horas.value = hours + ':' + minutes + 'h'
+  if (confirm(`Pretende preencher na planilha - ${store.getters.getPiscina}`)) {
+    const hoje = new Date()
+    let hours = hoje.getHours()
+    let minutes = hoje.getMinutes()
+    hours = String(hours).padStart(2, '0')
+    minutes = String(minutes).padStart(2, '0')
+    horas.value = hours + ':' + minutes + 'h'
 
-  if (
-    validade.value &&
-    horas.value != null &&
-    month != null &&
-    day != null &&
-    transparencia.value != null &&
-    lavagem_filtros.value != null
-  ) {
-    if (!aviso.value) {
-      if (confirm('Alguns valores encontram-se fora dos limites comuns pretende prosseguir?')) {
-        write()
+    if (
+      validade.value &&
+      horas.value != null &&
+      month != null &&
+      day != null &&
+      transparencia.value != null &&
+      lavagem_filtros.value != null
+    ) {
+      if (!aviso.value) {
+        if (confirm('Alguns valores encontram-se fora dos limites comuns pretende prosseguir?')) {
+          write()
+        } else {
+          return
+        }
       } else {
-        return
+        write()
       }
     } else {
-      write()
+      alert('Formulário mal preenchido!')
     }
   } else {
-    alert('Formulário mal preenchido!')
+    return
   }
 }
 
@@ -219,9 +223,10 @@ async function write() {
     observacoes: observacoes,
     mes: month,
     dia: day,
+    btn: true,
   }
   try {
-    const response = await store.dispatch('preencherSheet', form) // espera que termine
+    const response = await store.dispatch('preencherSheet', form)
 
     if (response.status === 200) {
       ph.value = null

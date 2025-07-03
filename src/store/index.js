@@ -51,12 +51,28 @@ const store = createStore({
     },
   },
   actions: {
-    solicitarToken() {
+    solicitarToken({ commit }) {
       return new Promise((resolve, reject) => {
+        let finished = false
+
+        const timeout = setTimeout(() => {
+          if (!finished) {
+            finished = true
+            alert('A autenticação expirou ou foi cancelada.')
+            commit('setSpinner', false)
+            return null
+          }
+        }, 12000) // 30 segundos de timeout
+
         const tokenClient = window.google.accounts.oauth2.initTokenClient({
           client_id: import.meta.env.VITE_CLIENT_ID,
           scope: 'https://www.googleapis.com/auth/spreadsheets',
           callback: (tokenResponse) => {
+            if (finished) return // ignora chamadas tardias
+
+            finished = true
+            clearTimeout(timeout)
+
             if (tokenResponse.error) {
               reject(tokenResponse)
             } else {
@@ -68,6 +84,7 @@ const store = createStore({
         tokenClient.requestAccessToken()
       })
     },
+
     async preencherSheet({ getters, dispatch, commit }, payload) {
       commit('setSpinner', !getters.getSpinner)
 
@@ -200,9 +217,16 @@ const store = createStore({
           if (isValid) {
             commit('setGoogleCredential', parsedToken.access)
           } else {
-            const newToken = await dispatch('solicitarToken')
-            commit('setGoogleCredential', newToken)
-            localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+            if (payload.btn === true) {
+              const newToken = await dispatch('solicitarToken')
+
+              commit('setGoogleCredential', newToken)
+              localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+            } else {
+              alert('Sem login efetuado! \nEfetue login manualmente no botão Refresh.')
+              commit('setSpinner', false)
+              return
+            }
           }
         } else {
           if (payload.btn === true) {
@@ -210,7 +234,7 @@ const store = createStore({
             commit('setGoogleCredential', newToken)
             localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
           } else {
-            alert('Sem login! Efetue login manualmente no botão')
+            alert('Sem login efetuado! \n Efetue login manualmente no botão Refresh.')
             commit('setSpinner', false)
             return
           }
@@ -300,11 +324,13 @@ const store = createStore({
             commit('setGoogleCredential', parsedToken.access)
           } else {
             const newToken = await dispatch('solicitarToken')
+
             commit('setGoogleCredential', newToken)
             localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
           }
         } else {
           const newToken = await dispatch('solicitarToken')
+
           commit('setGoogleCredential', newToken)
           localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
         }
