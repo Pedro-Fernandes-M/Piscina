@@ -1,12 +1,12 @@
 <script setup>
 import { RouterView } from 'vue-router'
 import { useStore } from 'vuex'
-import router from './router'
+import { router } from './router'
 import { onBeforeMount, ref } from 'vue'
 
 const store = useStore()
 
-document.addEventListener('contextmenu', (event) => event.preventDefault())
+/* document.addEventListener('contextmenu', (event) => event.preventDefault())
 
 // Disable F12, Ctrl+Shift+I
 document.addEventListener('keydown', (event) => {
@@ -54,7 +54,7 @@ function stopApp() {
 }
 
 // Call the detection function
-detectDevTools()
+detectDevTools() */
 
 const touchStartX = ref(0)
 const touchEndX = ref(0)
@@ -111,15 +111,12 @@ onBeforeMount(clearStorage)
 @keyframes fadeSlideIn {
   0% {
     opacity: 0;
-    transform: translateX(60px);
   }
   50% {
     opacity: 0.5;
-    transform: translateX(30px);
   }
   100% {
     opacity: 1;
-    transform: translateX(0);
   }
 }
 
@@ -127,15 +124,12 @@ onBeforeMount(clearStorage)
 @keyframes fadeSlideOut {
   0% {
     opacity: 1;
-    transform: translateX(0);
   }
   50% {
     opacity: 0.5;
-    transform: translateX(-30px);
   }
   100% {
     opacity: 0;
-    transform: translateX(-60px);
   }
 }
 </style>

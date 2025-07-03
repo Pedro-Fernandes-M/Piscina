@@ -7,15 +7,19 @@
         </h2>
         <h3>{{ day }} de {{ month }}</h3>
       </div>
-      <div v-if="rows" class="gap">
-        <div v-for="(item, index) in rows" :key="index">
+      <div v-if="data" class="gap">
+        <div v-for="(item, index) in data" :key="index">
           <div v-if="item.length > 0" class="grid">
             <span class="grid1">
               <span class="font"> Hora </span>
               <br />
               {{ item[0] }}
             </span>
-            <span v-for="(data, index1) in item.slice(1, item.length - 1)" :key="index1">
+            <span
+              v-for="(data, index1) in item.slice(1).filter((item) => item !== 'Filipe Fernandes')"
+              :key="index1"
+              :class="[header[index1] === 'Obs.' ? 'grid2' : '']"
+            >
               <span class="weight">
                 {{ header[index1] }}
               </span>
@@ -25,7 +29,11 @@
             <span class="grid1">
               <span class="font"> Responsável </span>
               <br />
-              {{ item[item.length - 1] }}
+              {{
+                item[item.length - 1] === 'Filipe Fernandes'
+                  ? item[item.length - 1]
+                  : item[item.length - 2]
+              }}
             </span>
             <button class="button" @click="deleteLog(index)">
               <div class="forma">
@@ -34,12 +42,12 @@
             </button>
           </div>
         </div>
-        <div v-if="rows.length === 0" class="center">Sem registos neste dia!</div>
+        <div v-if="data.length === 0" class="center">Sem registos neste dia!</div>
       </div>
       <div v-else class="center">Sem dados</div>
-    </div>
-    <div class="btn">
-      <button @click="lerDados" class="button1">Refresh</button>
+      <div class="center">
+        <button @click="lerDados" class="button1">Refresh</button>
+      </div>
     </div>
     <SpinnerCard v-if="spinner"></SpinnerCard>
   </div>
@@ -50,6 +58,7 @@ import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import SpinnerCard from '@/components/SpinnerCard.vue'
 import IconTrash from '@/components/icons/IconTrash.vue'
+import { router } from '@/router'
 
 const store = useStore()
 
@@ -81,8 +90,18 @@ store.dispatch('lerPlanilha', {
   mes: month,
 })
 
-const header = ref(['Ph', 'Temp.', 'Residual', 'Total', 'Transp.', 'N.º', 'Vol.', 'Filtros'])
-const rows = computed(() => {
+const header = ref([
+  'Ph',
+  'Temp.',
+  'Residual',
+  'Total',
+  'Transp.',
+  'N.º',
+  'Vol.',
+  'Filtros',
+  'Obs.',
+])
+const data = computed(() => {
   const values = []
   if (store.getters.getTabela.length > 0) {
     for (let i = 0; i < store.getters.getTabela.length; i++) {
@@ -127,9 +146,15 @@ function mudarSheet() {
   }
 }
 
-function deleteLog(index) {
+async function deleteLog(index) {
   if (confirm(`Pretende apagar o registo da planilha - ${store.getters.getPiscina}?`)) {
-    store.dispatch('deleteLog', { mes: month, index: index, dia: day })
+    if (confirm('Apagar e copiar para formulário ou só Apagar?')) {
+      store.commit('setChange', data.value[index])
+      await store.dispatch('deleteLog', { mes: month, index: index, dia: day })
+      router.push('/')
+    } else {
+      store.dispatch('deleteLog', { mes: month, index: index, dia: day })
+    }
   } else {
     return
   }
@@ -146,7 +171,8 @@ function deleteLog(index) {
   font-size: 16px;
   cursor: pointer;
   transition: background 0.2s ease;
-  width: 70%;
+  margin-top: 1.5rem;
+  width: 100%;
 }
 .btn {
   width: 100%;
@@ -179,6 +205,9 @@ function deleteLog(index) {
   grid-column: 1 / span 2;
   color: aliceblue;
   margin-top: 0.5rem;
+}
+.grid2 {
+  grid-column: 1 / span 2;
 }
 .button {
   display: flex;

@@ -84,15 +84,23 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import SpinnerCard from '@/components/SpinnerCard.vue'
+import { previousRoute } from '@/router'
+import { useRoute } from 'vue-router'
 
 const store = useStore()
+const route = useRoute()
 
 const spinner = computed(() => {
   return store.getters.getSpinner
 })
+
+const redirect = ref(false)
+if (previousRoute.value?.path === '/table' && route.path === '/') {
+  redirect.value = true
+}
 
 const day = new Date().getDate()
 const monthNames = [
@@ -124,6 +132,29 @@ const transparencia = ref(null)
 const volume = ref(0)
 const lavagem_filtros = ref(null)
 const observacoes = ref('')
+
+watch(
+  redirect,
+  (novo) => {
+    if (novo) {
+      const change = store.getters.getChange
+      if (change) {
+        horas.value = change[0]
+        ph.value = change[1]
+        temperatura_agua.value = change[2]
+        residual_desinfetante.value = change[3]
+        total_residual.value = change[4]
+        transparencia.value = change[5]
+        num_banhistas.value = change[6]
+        volume.value = change[7] === '' ? 0 : change[7]
+        lavagem_filtros.value = change[8]
+        observacoes.value = change[10]
+      }
+      store.commit('setChange', [])
+    }
+  },
+  { immediate: true },
+)
 
 function mudarSheet() {
   if (piscina.value === 'Piscina Interior') {
@@ -177,13 +208,14 @@ const aviso = computed(() => {
 
 async function preencher() {
   if (confirm(`Pretende preencher na planilha - ${store.getters.getPiscina}`)) {
-    const hoje = new Date()
-    let hours = hoje.getHours()
-    let minutes = hoje.getMinutes()
-    hours = String(hours).padStart(2, '0')
-    minutes = String(minutes).padStart(2, '0')
-    horas.value = hours + ':' + minutes + 'h'
-
+    if (horas.value === null) {
+      const hoje = new Date()
+      let hours = hoje.getHours()
+      let minutes = hoje.getMinutes()
+      hours = String(hours).padStart(2, '0')
+      minutes = String(minutes).padStart(2, '0')
+      horas.value = hours + ':' + minutes + 'h'
+    }
     if (
       validade.value &&
       horas.value != null &&

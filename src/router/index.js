@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import TheForm from '@/views/TheForm.vue'
 import TheTable from '@/views/TheTable.vue'
+import { ref } from 'vue'
+
+const previousRoute = ref(null)
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,4 +21,9 @@ const router = createRouter({
   ],
 })
 
-export default router
+router.beforeEach((to, from, next) => {
+  previousRoute.value = from
+  next()
+})
+
+export { router, previousRoute }
