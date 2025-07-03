@@ -118,6 +118,12 @@ function mudarSheet() {
   } else {
     store.commit('setPiscina', 'Piscina Interior')
     store.commit('setTabela', [])
+    if (localStorage.getItem('logs') === null) {
+      store.dispatch('lerPlanilha', {
+        dia: day,
+        mes: month,
+      })
+    }
   }
 }
 
