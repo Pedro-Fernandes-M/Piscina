@@ -271,7 +271,7 @@ watch(response, async (novo) => {
 }
 
 .weight {
-  font-weight: 500;
+  font-weight: 580;
   color: aliceblue;
 }
 
