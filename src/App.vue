@@ -6,7 +6,7 @@ import { onBeforeMount, ref } from 'vue'
 
 const store = useStore()
 
-/* document.addEventListener('contextmenu', (event) => event.preventDefault())
+document.addEventListener('contextmenu', (event) => event.preventDefault())
 
 // Disable F12, Ctrl+Shift+I
 document.addEventListener('keydown', (event) => {
@@ -54,7 +54,7 @@ function stopApp() {
 }
 
 // Call the detection function
-detectDevTools() */
+detectDevTools()
 
 const touchStartX = ref(0)
 const touchEndX = ref(0)
@@ -94,14 +94,14 @@ onBeforeMount(clearStorage)
 
 <style>
 .fade-slide-enter-active {
-  animation: fadeSlideIn 400ms ease forwards;
+  animation: fadeSlideIn 230ms ease-in forwards;
   position: absolute;
   top: 0;
   left: 0;
 }
 
 .fade-slide-leave-active {
-  animation: fadeSlideOut 400ms ease backwards;
+  animation: fadeSlideOut 250ms ease-out backwards;
   position: absolute;
   top: 0;
   left: 0;
@@ -112,9 +112,6 @@ onBeforeMount(clearStorage)
   0% {
     opacity: 0;
   }
-  50% {
-    opacity: 0.5;
-  }
   100% {
     opacity: 1;
   }
@@ -124,9 +121,6 @@ onBeforeMount(clearStorage)
 @keyframes fadeSlideOut {
   0% {
     opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
   }
   100% {
     opacity: 0;

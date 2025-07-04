@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper" @dblclick="store.commit('setSpinner', false)">
-    <div class="spinner" />
+    <div class="spinner" @dblclick.stop />
   </div>
 </template>
 

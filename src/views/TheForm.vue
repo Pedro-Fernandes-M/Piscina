@@ -77,9 +77,19 @@
           v-model="observacoes"
         />
       </div>
-      <button @click.prevent="preencher" type="submit">Preencher</button>
+      <button @click.prevent="alert" type="submit">Preencher</button>
     </form>
-    <SpinnerCard v-if="spinner"></SpinnerCard>
+    <transition name="fade-slide" mode="out-in">
+      <SpinnerCard v-if="spinner"></SpinnerCard>
+    </transition>
+    <transition name="fade-slide" mode="out-in">
+      <AlertCard
+        v-if="store.getters['alert/getAlert']"
+        :text="store.getters['alert/getText']"
+        :btn="store.getters['alert/getBtn']"
+        :choice="store.getters['alert/getChoice']"
+      ></AlertCard>
+    </transition>
   </div>
 </template>
 
@@ -89,6 +99,7 @@ import { useStore } from 'vuex'
 import SpinnerCard from '@/components/SpinnerCard.vue'
 import { previousRoute } from '@/router'
 import { useRoute } from 'vue-router'
+import AlertCard from '@/components/AlertCard.vue'
 
 const store = useStore()
 const route = useRoute()
@@ -121,6 +132,7 @@ const month = monthNames[new Date().getMonth()]
 const piscina = computed(() => {
   return store.getters.getPiscina
 })
+const go = ref()
 
 const ph = ref(null)
 const num_banhistas = ref(0)
@@ -206,38 +218,70 @@ const aviso = computed(() => {
   )
 })
 
-async function preencher() {
-  if (confirm(`Pretende preencher na planilha - ${store.getters.getPiscina}`)) {
-    if (horas.value === null) {
-      const hoje = new Date()
-      let hours = hoje.getHours()
-      let minutes = hoje.getMinutes()
-      hours = String(hours).padStart(2, '0')
-      minutes = String(minutes).padStart(2, '0')
-      horas.value = hours + ':' + minutes + 'h'
-    }
-    if (
-      validade.value &&
-      horas.value != null &&
-      month != null &&
-      day != null &&
-      transparencia.value != null &&
-      lavagem_filtros.value != null
-    ) {
-      if (!aviso.value) {
-        if (confirm('Alguns valores encontram-se fora dos limites comuns pretende prosseguir?')) {
-          write()
-        } else {
-          return
-        }
-      } else {
-        write()
-      }
-    } else {
-      alert('Formulário mal preenchido!')
-    }
+const response = computed(() => {
+  return store.getters['alert/getResponse']
+})
+
+watch(response, async (novo) => {
+  if (novo && !go.value) {
+    preencher()
   } else {
     return
+  }
+})
+
+function alert() {
+  go.value = false
+  if (horas.value === null) {
+    const hoje = new Date()
+    let hours = hoje.getHours()
+    let minutes = hoje.getMinutes()
+    hours = String(hours).padStart(2, '0')
+    minutes = String(minutes).padStart(2, '0')
+    horas.value = hours + ':' + minutes + 'h'
+  }
+  if (
+    validade.value &&
+    horas.value != null &&
+    month != null &&
+    day != null &&
+    transparencia.value != null &&
+    lavagem_filtros.value != null
+  ) {
+    store.commit('alert/setResponse', null)
+    store.commit('alert/setBtn', 'confirm')
+    store.commit(
+      'alert/setText',
+      `Pretende efetuar registo na planilha - ${store.getters.getPiscina}?`,
+    )
+    store.commit('alert/setAlert')
+  } else {
+    store.commit('alert/setBtn', 'alert')
+    store.commit('alert/setText', `Formulário mal preenchido!`)
+    store.commit('alert/setAlert')
+  }
+}
+
+function alert1() {
+  go.value = true
+  store.commit('alert/setBtn', 'confirm')
+  store.commit(
+    'alert/setText',
+    `Alguns valores encontram-se fora dos limites normais pretende prosseguir?`,
+  )
+  store.commit('alert/setAlert')
+}
+
+async function preencher() {
+  if (!aviso.value) {
+    alert1()
+    if (go.value) {
+      write()
+    } else {
+      return
+    }
+  } else {
+    write()
   }
 }
 
@@ -272,10 +316,14 @@ async function write() {
       lavagem_filtros.value = null
       observacoes.value = ''
     } else {
-      alert('Erro ao preencher a planilha, tente submeter de novo.')
+      store.commit('alert/setBtn', 'alert')
+      store.commit('alert/setText', `Erro ao preencher a planilha, tente submeter de novo.`)
+      store.commit('alert/setAlert')
     }
   } catch (error) {
-    alert('Erro ao preencher a planilha, tente submeter de novo.')
+    store.commit('alert/setBtn', 'alert')
+    store.commit('alert/setText', `Erro ao preencher a planilha, tente submeter de novo.`)
+    store.commit('alert/setAlert')
     console.error(error)
   }
 }

@@ -1,5 +1,6 @@
 import { createStore } from 'vuex'
 import { gapi } from 'gapi-script'
+import alert from './alert'
 
 const store = createStore({
   state: {
@@ -65,7 +66,9 @@ const store = createStore({
         const timeout = setTimeout(() => {
           if (!finished) {
             finished = true
-            alert('A autenticação expirou ou foi cancelada.')
+            commit('alert/setBtn', 'alert')
+            commit('alert/setText', `A autenticação expirou ou foi cancelada.`)
+            commit('alert/setAlert')
             commit('setSpinner', false)
             return null
           }
@@ -163,7 +166,9 @@ const store = createStore({
 
         if (linhaParaEscreverIdx === undefined) {
           console.error('Não encontrou linha vazia na coluna F para o dia', payload.dia)
-          alert('Não encontrou linha vazia na coluna F para o dia')
+          commit('alert/setBtn', 'alert')
+          commit('alert/setText', `Não encontrou linha vazia na coluna F para o dia`)
+          commit('alert/setAlert')
           commit('setSpinner', !getters.getSpinner)
           const response = { status: 400 }
           return response
@@ -199,9 +204,13 @@ const store = createStore({
 
         const response = await gapi.client.sheets.spreadsheets.values.update(params, resource)
         if (response.status === 200) {
-          alert('Planilha atualizada com sucesso')
+          commit('alert/setBtn', 'alert')
+          commit('alert/setText', `Planilha atualizada com sucesso`)
+          commit('alert/setAlert')
         } else {
-          alert('Erro' + response.status)
+          commit('alert/setBtn', 'alert')
+          commit('alert/setText', 'Erro' + response.status)
+          commit('alert/setAlert')
         }
         commit('setSpinner', !getters.getSpinner)
         return response
@@ -230,7 +239,6 @@ const store = createStore({
               commit('setGoogleCredential', newToken)
               localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
             } else {
-              alert('Sem login efetuado! \nEfetue login manualmente no botão Refresh.')
               commit('setSpinner', false)
               return
             }
@@ -241,7 +249,12 @@ const store = createStore({
             commit('setGoogleCredential', newToken)
             localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
           } else {
-            alert('Sem login efetuado! \nEfetue login manualmente no botão Refresh.')
+            commit('alert/setBtn', 'alert')
+            commit(
+              'alert/setText',
+              'Sem login efetuado! \nEfetue login manualmente no botão Refresh.',
+            )
+            commit('alert/setAlert')
             commit('setSpinner', false)
             return
           }
@@ -285,7 +298,9 @@ const store = createStore({
 
         if (linhasTotais.length === 0) {
           console.error('Não encontrou linhas para o dia', payload.dia)
-          alert('Não encontrou linhas para o dia')
+          commit('alert/setBtn', 'alert')
+          commit('alert/setText', 'Não encontrou linhas para o dia')
+          commit('alert/setAlert')
           commit('setSpinner', !getters.getSpinner)
           return { status: 400 }
         } else {
@@ -308,11 +323,15 @@ const store = createStore({
             localStorage.setItem('logs1', JSON.stringify(dadosLinhas))
           }
         } else {
-          alert(response.status)
+          commit('alert/setBtn', 'alert')
+          commit('alert/setText', response.status)
+          commit('alert/setAlert')
         }
         commit('setSpinner', !getters.getSpinner)
       } catch (error) {
-        alert('Erro ao ler dados do Sheets:', error)
+        commit('alert/setBtn', 'alert')
+        commit('alert/setText', 'Erro ao ler dados do Sheets:' + error)
+        commit('alert/setAlert')
         commit('setSpinner', !getters.getSpinner)
         return { status: 500, error }
       }
@@ -367,20 +386,29 @@ const store = createStore({
             values: [['', '', '', '', '', '', '', '', '', '', '']], // 11 colunas de F a P
           },
         })
-
-        alert(`Linha ${linha} limpa com sucesso!`)
+        if (payload.del) {
+          commit('alert/setBtn', 'alert')
+          commit('alert/setText', `Linha ${linha} limpa com sucesso!`)
+          commit('alert/setAlert')
+        }
 
         try {
           await dispatch('lerPlanilha', { mes: payload.mes, dia: payload.dia })
         } catch (error) {
-          alert('Erro ao ler linha:', error)
+          commit('alert/setBtn', 'alert')
+          commit('alert/setText', 'Erro ao apagar linha:' + error)
+          commit('alert/setAlert')
         }
       } catch (error) {
-        alert('Erro ao apagar linha:', error)
+        commit('alert/setBtn', 'alert')
+        commit('alert/setText', 'Erro ao apagar linha:' + error)
+        commit('alert/setAlert')
       }
     },
   },
-  modules: {},
+  modules: {
+    alert: alert,
+  },
 })
 
 export default store

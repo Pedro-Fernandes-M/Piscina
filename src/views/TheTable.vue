@@ -35,9 +35,14 @@
                   : item[item.length - 2]
               }}
             </span>
-            <button class="button" @click="deleteLog(index)">
+            <button class="button" @click="alert(index)">
               <div class="forma">
                 <IconTrash />
+              </div>
+            </button>
+            <button class="button btn-color" @click="alert1(index, true)">
+              <div class="forma">
+                <IconEdit />
               </div>
             </button>
           </div>
@@ -49,16 +54,28 @@
         <button @click="lerDados" class="button1">Refresh</button>
       </div>
     </div>
-    <SpinnerCard v-if="spinner"></SpinnerCard>
+    <transition name="fade-slide" mode="out-in">
+      <SpinnerCard v-if="spinner"></SpinnerCard>
+    </transition>
+    <transition name="fade-slide" mode="out-in">
+      <AlertCard
+        v-if="store.getters['alert/getAlert']"
+        :text="store.getters['alert/getText']"
+        :btn="store.getters['alert/getBtn']"
+        :choice="store.getters['alert/getChoice']"
+      ></AlertCard>
+    </transition>
   </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import SpinnerCard from '@/components/SpinnerCard.vue'
 import IconTrash from '@/components/icons/IconTrash.vue'
 import { router } from '@/router'
+import AlertCard from '@/components/AlertCard.vue'
+import IconEdit from '@/components/icons/IconEdit.vue'
 
 const store = useStore()
 
@@ -69,6 +86,10 @@ const spinner = computed(() => {
 const piscina = computed(() => {
   return store.getters.getPiscina
 })
+
+const index = ref()
+const edit = ref()
+
 const day = new Date().getDate()
 const monthNames = [
   'Janeiro',
@@ -146,19 +167,40 @@ function mudarSheet() {
   }
 }
 
-async function deleteLog(index) {
-  if (confirm(`Pretende apagar o registo da planilha - ${store.getters.getPiscina}?`)) {
-    if (confirm('Apagar e copiar para formulário ou só Apagar?')) {
-      store.commit('setChange', data.value[index])
-      await store.dispatch('deleteLog', { mes: month, index: index, dia: day })
-      router.push('/')
-    } else {
-      store.dispatch('deleteLog', { mes: month, index: index, dia: day })
-    }
-  } else {
-    return
-  }
+function alert(index1) {
+  index.value = index1
+  store.commit('alert/setBtn', 'confirm')
+  store.commit(
+    'alert/setText',
+    `Pretende apagar o registo da planilha - ${store.getters.getPiscina}?`,
+  )
+  store.commit('alert/setAlert')
 }
+
+function alert1(index1, edit1) {
+  index.value = index1
+  edit.value = edit1
+  store.commit('alert/setBtn', 'confirm')
+  store.commit(
+    'alert/setText',
+    `Pretende editar o registo da planilha - ${store.getters.getPiscina}?`,
+  )
+  store.commit('alert/setAlert')
+}
+
+const response = computed(() => store.getters['alert/getResponse'])
+watch(response, async (novo) => {
+  if (novo && edit.value) {
+    store.commit('setChange', data.value[index.value])
+    await store.dispatch('deleteLog', { mes: month, index: index.value, dia: day, del: false })
+    store.commit('alert/setResponse', null)
+    edit.value = false
+    router.push('/')
+  } else if (novo) {
+    store.dispatch('deleteLog', { mes: month, index: index.value, dia: day, del: true })
+    store.commit('alert/setResponse', null)
+  }
+})
 </script>
 
 <style scoped>
@@ -196,6 +238,8 @@ async function deleteLog(index) {
   display: grid;
   grid-template-columns: 1fr 1fr;
   text-align: center;
+  justify-content: center;
+  align-items: center;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto auto;
   gap: 5px;
@@ -213,11 +257,10 @@ async function deleteLog(index) {
   display: flex;
   justify-content: center;
   align-items: center;
-  grid-column: 1 / span 2;
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.1rem;
   margin-top: 0.5rem;
-  margin-right: 2.2rem;
-  margin-left: 2.2rem;
+  margin-right: 0.8rem;
+  margin-left: 0.8rem;
   margin-bottom: 0.5rem;
   height: 2rem;
   background-color: #e74c3c;
@@ -225,19 +268,6 @@ async function deleteLog(index) {
   border: none;
   border-radius: 0.5rem;
   cursor: pointer;
-  transition:
-    background-color 0.3s ease,
-    transform 0.2s ease;
-}
-
-.button:hover {
-  background-color: #c0392b;
-  transform: translateY(-1px);
-}
-
-.button:active {
-  transform: translateY(0);
-  background-color: #a93226;
 }
 
 .weight {
@@ -257,5 +287,9 @@ async function deleteLog(index) {
 .gap {
   display: grid;
   gap: 0.8rem;
+}
+
+.btn-color {
+  background-color: rgb(39, 105, 197);
 }
 </style>
