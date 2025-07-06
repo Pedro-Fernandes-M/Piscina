@@ -21,7 +21,7 @@ document.addEventListener('keydown', (event) => {
 })
 
 function detectDevTools() {
-  const devToolsCheck = new Function('debugger') // Using the `debugger` statement for detection.
+  const devToolsCheck = new Function('debugger')
   let isDevToolsOpen = false
 
   devToolsCheck() // Initial trigger for the debugger.
