@@ -85,11 +85,13 @@ onBeforeMount(clearStorage)
 </script>
 
 <template>
-  <router-view v-slot="{ Component }">
-    <transition name="fade-slide" mode="out-in">
-      <component :is="Component" @touchstart="onTouchStart" @touchend="onTouchEnd" />
-    </transition>
-  </router-view>
+  <keep-alive>
+    <router-view v-slot="{ Component }">
+      <transition name="fade-slide" mode="out-in">
+        <component :is="Component" @touchstart="onTouchStart" @touchend="onTouchEnd" />
+      </transition>
+    </router-view>
+  </keep-alive>
 </template>
 
 <style>
