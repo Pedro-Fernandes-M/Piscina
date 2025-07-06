@@ -94,11 +94,11 @@
 </template>
 
 <script setup>
-import { computed, onActivated, ref, watch } from 'vue'
+import { computed, onActivated, onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import SpinnerCard from '@/components/SpinnerCard.vue'
 import { previousRoute } from '@/router'
-import { useRoute } from 'vue-router'
+import { onBeforeRouteUpdate, useRoute } from 'vue-router'
 import AlertCard from '@/components/AlertCard.vue'
 
 const store = useStore()
@@ -145,7 +145,8 @@ const volume = ref(0)
 const lavagem_filtros = ref(null)
 const observacoes = ref('')
 
-onActivated(() => {
+const alert2 = () => {
+  confirm('oi')
   if (
     ph.value == undefined ||
     num_banhistas.value == undefined ||
@@ -169,7 +170,8 @@ onActivated(() => {
     lavagem_filtros.value = null
     observacoes.value = ''
   }
-})
+}
+onMounted(alert2)
 
 watch(
   redirect,
