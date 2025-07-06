@@ -133,18 +133,17 @@ const piscina = computed(() => {
   return store.getters.getPiscina
 })
 const go = ref()
-const r = store.getters.getRestore
 
-const ph = ref(r.ph || null)
-const num_banhistas = ref(r.num_banhistas || 0)
-const horas = ref(r.horas || null)
-const temperatura_agua = ref(r.temperatura_agua || 0)
-const residual_desinfetante = ref(r.residual_desinfetante || null)
-const total_residual = ref(r.total_residual || null)
-const transparencia = ref(r.transparencia || null)
-const volume = ref(r.volume || 0)
-const lavagem_filtros = ref(r.lavagem_filtros || null)
-const observacoes = ref(r.observacoes || '')
+const ph = ref(store.getters.getRestore.ph || null)
+const num_banhistas = ref(store.getters.getRestore.num_banhistas || 0)
+const horas = ref(store.getters.getRestore.horas || null)
+const temperatura_agua = ref(store.getters.getRestore.temperatura_agua || 0)
+const residual_desinfetante = ref(store.getters.getRestore.residual_desinfetante || null)
+const total_residual = ref(store.getters.getRestore.total_residual || null)
+const transparencia = ref(store.getters.getRestore.transparencia || null)
+const volume = ref(store.getters.getRestore.volume || 0)
+const lavagem_filtros = ref(store.getters.getRestore.lavagem_filtros || null)
+const observacoes = ref(store.getters.getRestore.observacoes || '')
 
 const clear = () => {
   if (
@@ -200,6 +199,7 @@ const restore = () => {
       lavagem_filtros: lavagem_filtros.value,
       observacoes: observacoes.value,
     })
+    console.log(store.getters.getRestore)
   }
 }
 
