@@ -134,46 +134,32 @@ const piscina = computed(() => {
 })
 const go = ref()
 
-const ph = ref(store.getters.getRestore.ph || null)
-const num_banhistas = ref(store.getters.getRestore.num_banhistas || 0)
-const horas = ref(store.getters.getRestore.horas || null)
-const temperatura_agua = ref(store.getters.getRestore.temperatura_agua || 0)
-const residual_desinfetante = ref(store.getters.getRestore.residual_desinfetante || null)
-const total_residual = ref(store.getters.getRestore.total_residual || null)
-const transparencia = ref(store.getters.getRestore.transparencia || null)
-const volume = ref(store.getters.getRestore.volume || 0)
-const lavagem_filtros = ref(store.getters.getRestore.lavagem_filtros || null)
-const observacoes = ref(store.getters.getRestore.observacoes || '')
+const ph = ref()
+const num_banhistas = ref()
+const horas = ref()
+const temperatura_agua = ref()
+const residual_desinfetante = ref()
+const total_residual = ref()
+const transparencia = ref()
+const volume = ref()
+const lavagem_filtros = ref()
+const observacoes = ref()
 
-const clear = () => {
-  if (
-    ph.value == undefined ||
-    num_banhistas.value == undefined ||
-    horas.value == undefined ||
-    temperatura_agua.value == undefined ||
-    residual_desinfetante.value == undefined ||
-    total_residual.value == undefined ||
-    transparencia.value == undefined ||
-    volume.value == undefined ||
-    lavagem_filtros.value == undefined ||
-    observacoes.value == undefined
-  ) {
-    ph.value = null
-    num_banhistas.value = 0
-    horas.value = null
-    temperatura_agua.value = 0
-    residual_desinfetante.value = null
-    total_residual.value = null
-    transparencia.value = null
-    volume.value = 0
-    lavagem_filtros.value = null
-    observacoes.value = ''
-  }
+const reset = () => {
+  ph.value = store.getters.getRestore.ph || null
+  num_banhistas.value = store.getters.getRestore.num_banhistas || 0
+  horas.value = store.getters.getRestore.horas || null
+  temperatura_agua.value = store.getters.getRestore.temperatura_agua || 0
+  residual_desinfetante.value = store.getters.getRestore.residual_desinfetante || null
+  total_residual.value = store.getters.getRestore.total_residual || null
+  transparencia.value = store.getters.getRestore.transparencia || null
+  volume.value = store.getters.getRestore.volume || 0
+  lavagem_filtros.value = store.getters.getRestore.lavagem_filtros || null
+  observacoes.value = store.getters.getRestore.observacoes || ''
 }
-onMounted(clear)
+onMounted(reset)
 
 const restore = () => {
-  console.log('oi')
   if (
     ph.value != null ||
     num_banhistas.value != 0 ||
@@ -186,7 +172,6 @@ const restore = () => {
     lavagem_filtros.value != null ||
     observacoes.value != ''
   ) {
-    console.log('oi')
     store.commit('setRestore', {
       ph: ph.value,
       num_banhistas: num_banhistas.value,
@@ -199,7 +184,6 @@ const restore = () => {
       lavagem_filtros: lavagem_filtros.value,
       observacoes: observacoes.value,
     })
-    console.log(store.getters.getRestore)
   }
 }
 

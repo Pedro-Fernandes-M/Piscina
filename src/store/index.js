@@ -11,7 +11,18 @@ const store = createStore({
     spinner: false,
     linhas: [],
     change: [],
-    restore: {},
+    restore: {
+      ph: null,
+      num_banhistas: null,
+      horas: null,
+      temperatura_agua: null,
+      residual_desinfetante: null,
+      total_residual: null,
+      transparencia: null,
+      volume: null,
+      lavagem_filtros: null,
+      observacoes: '',
+    },
   },
   getters: {
     getGoogleCredential(state) {
