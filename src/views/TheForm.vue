@@ -97,7 +97,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import SpinnerCard from '@/components/SpinnerCard.vue'
-import { previousRoute, router } from '@/router'
+import { previousRoute } from '@/router'
 import { useRoute } from 'vue-router'
 import AlertCard from '@/components/AlertCard.vue'
 
