@@ -2,6 +2,7 @@
   <div class="page">
     <form action="" class="form">
       <div class="center">
+        {{ r }}
         <h2 @click="mudarSheet">
           {{ piscina }}
         </h2>
@@ -94,7 +95,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import SpinnerCard from '@/components/SpinnerCard.vue'
 import { previousRoute } from '@/router'
@@ -133,17 +134,18 @@ const piscina = computed(() => {
   return store.getters.getPiscina
 })
 const go = ref()
+const r = store.getters.getRestore
 
-const ph = ref(null)
-const num_banhistas = ref(0)
-const horas = ref(null)
-const temperatura_agua = ref(0)
-const residual_desinfetante = ref(null)
-const total_residual = ref(null)
-const transparencia = ref(null)
-const volume = ref(0)
-const lavagem_filtros = ref(null)
-const observacoes = ref('')
+const ph = ref(r.ph || null)
+const num_banhistas = ref(r.num_banhistas || 0)
+const horas = ref(r.horas || null)
+const temperatura_agua = ref(r.temperatura_agua || 0)
+const residual_desinfetante = ref(r.residual_desinfetante || null)
+const total_residual = ref(r.total_residual || null)
+const transparencia = ref(r.transparencia || null)
+const volume = ref(r.volume || 0)
+const lavagem_filtros = ref(r.lavagem_filtros || null)
+const observacoes = ref(r.observacoes || '')
 
 const clear = () => {
   if (
@@ -171,6 +173,37 @@ const clear = () => {
   }
 }
 onMounted(clear)
+
+const restore = () => {
+  alert('oi')
+  if (
+    ph.value != null &&
+    num_banhistas.value != 0 &&
+    horas.value != null &&
+    temperatura_agua.value != 0 &&
+    residual_desinfetante.value != null &&
+    total_residual.value != null &&
+    transparencia.value != null &&
+    volume.value != 0 &&
+    lavagem_filtros.value != null &&
+    observacoes.value != ''
+  ) {
+    store.commit('setRestore', {
+      ph: ph.value,
+      num_banhistas: num_banhistas.value,
+      horas: horas.value,
+      temperatura_agua: temperatura_agua.value,
+      residual_desinfetante: residual_desinfetante.value,
+      total_residual: total_residual.value,
+      transparencia: transparencia.value,
+      volume: volume.value,
+      lavagem_filtros: lavagem_filtros.value,
+      observacoes: (observacoes.value = ''),
+    })
+  }
+}
+
+onUnmounted(restore)
 
 watch(
   redirect,

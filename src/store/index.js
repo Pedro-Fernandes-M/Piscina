@@ -11,6 +11,7 @@ const store = createStore({
     spinner: false,
     linhas: [],
     change: [],
+    restore: {},
   },
   getters: {
     getGoogleCredential(state) {
@@ -34,6 +35,9 @@ const store = createStore({
     getChange(state) {
       return state.change
     },
+    getRestore(state) {
+      return state.restore
+    },
   },
   mutations: {
     setGoogleCredential(state, token) {
@@ -56,6 +60,9 @@ const store = createStore({
     },
     setChange(state, payload) {
       state.change = payload
+    },
+    setRestore(state, payload) {
+      state.restore = payload
     },
   },
   actions: {
