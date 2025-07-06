@@ -94,7 +94,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onActivated, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import SpinnerCard from '@/components/SpinnerCard.vue'
 import { previousRoute } from '@/router'
@@ -144,6 +144,32 @@ const transparencia = ref(null)
 const volume = ref(0)
 const lavagem_filtros = ref(null)
 const observacoes = ref('')
+
+onActivated(() => {
+  if (
+    ph.value == undefined ||
+    num_banhistas.value == undefined ||
+    horas.value == undefined ||
+    temperatura_agua.value == undefined ||
+    residual_desinfetante.value == undefined ||
+    total_residual.value == undefined ||
+    transparencia.value == undefined ||
+    volume.value == undefined ||
+    lavagem_filtros.value == undefined ||
+    observacoes.value == undefined
+  ) {
+    ph.value = null
+    num_banhistas.value = 0
+    horas.value = null
+    temperatura_agua.value = 0
+    residual_desinfetante.value = null
+    total_residual.value = null
+    transparencia.value = null
+    volume.value = 0
+    lavagem_filtros.value = null
+    observacoes.value = ''
+  }
+})
 
 watch(
   redirect,
