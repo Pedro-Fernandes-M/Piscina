@@ -8,7 +8,7 @@
         <h3>{{ day }} de {{ month }}</h3>
       </div>
       <div class="input">
-        <label for="">Temperatura Água {{ temperatura_agua + ' vazio' }}</label>
+        <label for="">Temperatura Água</label>
         <input
           :class="[temperatura_agua === '' ? 'input-erro' : '']"
           type="number"
