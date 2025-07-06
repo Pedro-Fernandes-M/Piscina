@@ -134,16 +134,16 @@ const piscina = computed(() => {
 })
 const go = ref()
 
-const ph = ref()
-const num_banhistas = ref()
-const horas = ref()
-const temperatura_agua = ref()
-const residual_desinfetante = ref()
-const total_residual = ref()
-const transparencia = ref()
-const volume = ref()
-const lavagem_filtros = ref()
-const observacoes = ref()
+const ph = ref(null)
+const num_banhistas = ref(0)
+const horas = ref(null)
+const temperatura_agua = ref(0)
+const residual_desinfetante = ref(null)
+const total_residual = ref(null)
+const transparencia = ref(null)
+const volume = ref(0)
+const lavagem_filtros = ref(null)
+const observacoes = ref('')
 
 watch(
   redirect,
