@@ -2,7 +2,6 @@
   <div class="page">
     <form action="" class="form">
       <div class="center">
-        {{ r }}
         <h2 @click="mudarSheet">
           {{ piscina }}
         </h2>
@@ -95,10 +94,10 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import SpinnerCard from '@/components/SpinnerCard.vue'
-import { previousRoute } from '@/router'
+import { previousRoute, router } from '@/router'
 import { useRoute } from 'vue-router'
 import AlertCard from '@/components/AlertCard.vue'
 
@@ -175,19 +174,20 @@ const clear = () => {
 onMounted(clear)
 
 const restore = () => {
-  alert('oi')
+  console.log('oi')
   if (
-    ph.value != null &&
-    num_banhistas.value != 0 &&
-    horas.value != null &&
-    temperatura_agua.value != 0 &&
-    residual_desinfetante.value != null &&
-    total_residual.value != null &&
-    transparencia.value != null &&
-    volume.value != 0 &&
-    lavagem_filtros.value != null &&
+    ph.value != null ||
+    num_banhistas.value != 0 ||
+    horas.value != null ||
+    temperatura_agua.value != 0 ||
+    residual_desinfetante.value != null ||
+    total_residual.value != null ||
+    transparencia.value != null ||
+    volume.value != 0 ||
+    lavagem_filtros.value != null ||
     observacoes.value != ''
   ) {
+    console.log('oi')
     store.commit('setRestore', {
       ph: ph.value,
       num_banhistas: num_banhistas.value,
@@ -198,12 +198,12 @@ const restore = () => {
       transparencia: transparencia.value,
       volume: volume.value,
       lavagem_filtros: lavagem_filtros.value,
-      observacoes: (observacoes.value = ''),
+      observacoes: observacoes.value,
     })
   }
 }
 
-onUnmounted(restore)
+onBeforeUnmount(restore)
 
 watch(
   redirect,
