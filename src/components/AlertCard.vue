@@ -43,11 +43,11 @@ function input(input) {
   display: grid;
   text-align: center;
   background-color: rgb(41, 42, 43);
-  padding: 1rem;
+  padding: 0.85rem;
   border-radius: 0.75rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* shadow */
-  width: 18.5rem;
-  height: 12rem;
+  width: 17rem;
+  height: 11rem;
   align-items: end;
 }
 
