@@ -48,8 +48,9 @@ function detectDevTools() {
 
 // Function to stop the app
 function stopApp() {
-  const displayHeight = window.innerHeight - 100
-  document.body.innerHTML = `<h1 class="color" style="height:${displayHeight}px">Unauthorized Access</h1>`
+  const displayHeight = window.innerHeight
+  const displayWidth = window.innerWidth
+  document.body.innerHTML = `<div class="color" style="height:${displayHeight}px;width:${displayWidth};text-align:center;display:flex;justify-content: center;align-items:center"><h1>Unauthorized Access<h1/></div>`
   throw new Error('DevTools detected! App execution stopped.')
 }
 
@@ -98,6 +99,8 @@ onBeforeMount(clearStorage)
   position: absolute;
   top: 0;
   left: 0;
+  align-items: center;
+  text-align: center;
 }
 
 .fade-slide-leave-active {

@@ -303,7 +303,7 @@ function alert() {
       `Pretende efetuar registo na planilha - ${store.getters.getPiscina}?`,
     )
     store.commit('alert/setAlert')
-  } else if (!aviso.value) {
+  } else if (!aviso.value && validade.value) {
     alert1()
   } else {
     store.commit('alert/setBtn', 'alert')
