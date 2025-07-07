@@ -109,7 +109,7 @@ const spinner = computed(() => {
 })
 
 const redirect = ref(false)
-if (previousRoute.value?.path === '/table' && route.path === '/') {
+if (previousRoute.value?.path === '/table' && route.path === '/' && store.getters.getEdit) {
   redirect.value = true
 }
 
@@ -146,16 +146,18 @@ const lavagem_filtros = ref()
 const observacoes = ref()
 
 const reset = () => {
-  ph.value = store.getters.getRestore.ph || null
-  num_banhistas.value = store.getters.getRestore.num_banhistas || 0
-  horas.value = store.getters.getRestore.horas || null
-  temperatura_agua.value = store.getters.getRestore.temperatura_agua || 0
-  residual_desinfetante.value = store.getters.getRestore.residual_desinfetante || null
-  total_residual.value = store.getters.getRestore.total_residual || null
-  transparencia.value = store.getters.getRestore.transparencia || null
-  volume.value = store.getters.getRestore.volume || 0
-  lavagem_filtros.value = store.getters.getRestore.lavagem_filtros || null
-  observacoes.value = store.getters.getRestore.observacoes || ''
+  if (redirect.value != true) {
+    ph.value = store.getters.getRestore.ph || null
+    num_banhistas.value = store.getters.getRestore.num_banhistas || 0
+    horas.value = store.getters.getRestore.horas || null
+    temperatura_agua.value = store.getters.getRestore.temperatura_agua || 0
+    residual_desinfetante.value = store.getters.getRestore.residual_desinfetante || null
+    total_residual.value = store.getters.getRestore.total_residual || null
+    transparencia.value = store.getters.getRestore.transparencia || null
+    volume.value = store.getters.getRestore.volume || 0
+    lavagem_filtros.value = store.getters.getRestore.lavagem_filtros || null
+    observacoes.value = store.getters.getRestore.observacoes || ''
+  }
 }
 onMounted(reset)
 
@@ -207,6 +209,7 @@ watch(
         observacoes.value = change[10]
       }
       store.commit('setChange', [])
+      store.commit('setEdit', false)
     }
   },
   { immediate: true },
@@ -267,7 +270,7 @@ const response = computed(() => {
 })
 
 watch(response, async (novo) => {
-  if (novo && !go.value) {
+  if (novo) {
     preencher()
   } else {
     return
@@ -290,7 +293,8 @@ function alert() {
     month != null &&
     day != null &&
     transparencia.value != null &&
-    lavagem_filtros.value != null
+    lavagem_filtros.value != null &&
+    aviso.value
   ) {
     store.commit('alert/setResponse', null)
     store.commit('alert/setBtn', 'confirm')
@@ -299,6 +303,8 @@ function alert() {
       `Pretende efetuar registo na planilha - ${store.getters.getPiscina}?`,
     )
     store.commit('alert/setAlert')
+  } else if (!aviso.value) {
+    alert1()
   } else {
     store.commit('alert/setBtn', 'alert')
     store.commit('alert/setText', `Formulário mal preenchido!`)
@@ -307,29 +313,16 @@ function alert() {
 }
 
 function alert1() {
-  go.value = true
+  store.commit('alert/setResponse', null)
   store.commit('alert/setBtn', 'confirm')
   store.commit(
     'alert/setText',
-    `Alguns valores encontram-se fora dos limites normais pretende prosseguir?`,
+    `Alguns valores encontram-se fora dos limites normais pretende registar-los na planilha - ${store.getters.getPiscina}?`,
   )
   store.commit('alert/setAlert')
 }
 
 async function preencher() {
-  if (!aviso.value) {
-    alert1()
-    if (go.value) {
-      write()
-    } else {
-      return
-    }
-  } else {
-    write()
-  }
-}
-
-async function write() {
   const form = {
     horas: horas,
     ph: ph,
@@ -359,7 +352,7 @@ async function write() {
       volume.value = 0
       lavagem_filtros.value = null
       observacoes.value = ''
-    } else {
+    } else if (response.status != 399) {
       store.commit('alert/setBtn', 'alert')
       store.commit('alert/setText', `Erro ao preencher a planilha, tente submeter de novo.`)
       store.commit('alert/setAlert')

@@ -23,6 +23,7 @@ const store = createStore({
       lavagem_filtros: null,
       observacoes: '',
     },
+    edit: false,
   },
   getters: {
     getGoogleCredential(state) {
@@ -49,6 +50,9 @@ const store = createStore({
     getRestore(state) {
       return state.restore
     },
+    getEdit(state) {
+      return state.edit
+    },
   },
   mutations: {
     setGoogleCredential(state, token) {
@@ -74,6 +78,9 @@ const store = createStore({
     },
     setRestore(state, payload) {
       state.restore = payload
+    },
+    setEdit(state, payload) {
+      state.edit = payload
     },
   },
   actions: {
@@ -183,12 +190,15 @@ const store = createStore({
         })
 
         if (linhaParaEscreverIdx === undefined) {
-          console.error('Não encontrou linha vazia na coluna F para o dia', payload.dia)
           commit('alert/setBtn', 'alert')
-          commit('alert/setText', `Não encontrou linha vazia na coluna F para o dia`)
+          commit(
+            'alert/setText',
+            `Não encontrou linha vazia na coluna F para o dia ${payload.dia}.`,
+          )
           commit('alert/setAlert')
+          console.error('Não encontrou linha vazia na coluna F para o dia', payload.dia)
           commit('setSpinner', !getters.getSpinner)
-          const response = { status: 400 }
+          const response = { status: 399 }
           return response
         }
 
@@ -225,6 +235,7 @@ const store = createStore({
           commit('alert/setBtn', 'alert')
           commit('alert/setText', `Planilha atualizada com sucesso`)
           commit('alert/setAlert')
+          commit('alert/setResponse', false)
         } else {
           commit('alert/setBtn', 'alert')
           commit('alert/setText', 'Erro' + response.status)

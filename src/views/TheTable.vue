@@ -180,6 +180,7 @@ function alert(index1) {
 function alert1(index1, edit1) {
   index.value = index1
   edit.value = edit1
+  store.commit('setEdit', true)
   store.commit('alert/setBtn', 'confirm')
   store.commit(
     'alert/setText',
