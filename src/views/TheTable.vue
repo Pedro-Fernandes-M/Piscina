@@ -126,8 +126,6 @@ if (previousRoute.value?.path === '/quartos' && route.path === '/table') {
   redirect.value = true
 }
 
-console.log(redirect.value)
-
 const piscina = computed(() => {
   return store.getters.getPiscina
 })
@@ -159,7 +157,6 @@ if (redirect.value) {
     ano: new Date().getFullYear(),
     options: 'quartos',
   })
-  console.log('quartos')
 } else {
   store.dispatch('lerPlanilha', {
     dia: day,

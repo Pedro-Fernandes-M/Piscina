@@ -234,14 +234,13 @@ const store = createStore({
             range: `${payload.ano}!A:A`,
           })
 
-          console.log(readRes)
           const rows = readRes.result.values || []
-          console.log(rows)
+
           const firstEmptyIndex = rows.findIndex((row, index) => {
             if (index <= 1) return false // ignora índice 0 e 1 (linhas 3 e 4)
             return !row[0] || row[0].trim() === ''
           })
-          console.log(firstEmptyIndex)
+
           // Como estamos começando a leitura a partir da linha 3, ajustamos o índice
           const rowNumber =
             firstEmptyIndex >= 0
@@ -249,7 +248,7 @@ const store = createStore({
               : rows.length < 2
                 ? rows.length + 2
                 : rows.length + 1
-          console.log(rowNumber)
+
           // Define a faixa e os valores a escrever
           range = `${payload.ano}!A${rowNumber}:J${rowNumber}`
           values = [
@@ -388,7 +387,7 @@ const store = createStore({
 
           // Só os números das linhas reais (lembrando do +1 pois começa em 1 no Sheets)
           const linhasIdx = linhasFiltradas.map(({ index }) => index + 1)
-          console.log(linhasIdx)
+
           commit('setLinhas', linhasIdx)
 
           response = respostaFiltrada
@@ -435,7 +434,7 @@ const store = createStore({
         if (response.status === 200) {
           const dadosLinhas = response.result.values || []
           commit('setTabela', dadosLinhas)
-          console.log(payload)
+
           if (payload.options == 'quartos') {
             localStorage.setItem('logs2', JSON.stringify(dadosLinhas))
           } else if (store.getters.getPiscina === 'Piscina Interior') {
@@ -502,7 +501,7 @@ const store = createStore({
       let range = null
       if (payload.options == 'quartos') {
         linha = getters.getLinhas[payload.index]
-        console.log(linha)
+
         range = `${payload.ano}!A${linha}:K${linha}`
       } else {
         linha = getters.getLinhas[payload.index]

@@ -6,43 +6,7 @@ import { onBeforeUnmount, ref } from 'vue'
 
 const store = useStore()
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistration().then((reg) => {
-    if (reg) {
-      requestAndNotify()
-      console.log('Service Worker is registered:', reg)
-    } else {
-      console.log('No Service Worker registered yet.')
-    }
-  })
-} else {
-  console.log('Service Worker not supported')
-}
-
-async function requestAndNotify() {
-  if (Notification.permission === 'default') {
-    const permission = await Notification.requestPermission()
-    if (permission !== 'granted') {
-      console.log('Notification permission denied')
-      return
-    }
-  }
-
-  if (Notification.permission === 'granted') {
-    console.log('oi')
-    const registration = await navigator.serviceWorker.ready
-    console.log('oi')
-    setTimeout(() => {
-      registration.showNotification('Test Notification', {
-        body: 'This is a test notification 30 seconds after app start',
-        icon: '',
-        tag: 'test-notification',
-      })
-    }, 300)
-  }
-}
-
-/* document.addEventListener('contextmenu', (event) => event.preventDefault())
+document.addEventListener('contextmenu', (event) => event.preventDefault())
 
 // Disable F12, Ctrl+Shift+I
 document.addEventListener('keydown', (event) => {
@@ -91,7 +55,7 @@ function stopApp() {
 }
 
 // Call the detection function
-detectDevTools() */
+detectDevTools()
 
 store.dispatch('defenicoes/getSettings')
 

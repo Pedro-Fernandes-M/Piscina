@@ -145,7 +145,7 @@ watch(
   (novo) => {
     if (novo) {
       const change = store.getters.getChange
-      console.log('oi')
+
       if (change) {
         data = change[0]
         quarto.value = change[1]
@@ -202,7 +202,6 @@ const preenchido_quarto = computed(() => ({
 
 function alert() {
   if (Object.values(preenchido_quarto.value).some((value) => value === false)) {
-    console.log(preenchido_quarto.value)
     store.commit('alert/setBtn', 'alert')
     store.commit('alert/setText', `Formulário mal preenchido!`)
     store.commit('alert/setAlert')
@@ -215,7 +214,6 @@ function alert() {
     )
     store.commit('alert/setAlert')
   } else {
-    console.log(validade_quarto.value)
     store.commit('alert/setResponse', null)
     store.commit('alert/setBtn', 'confirm')
     store.commit(
