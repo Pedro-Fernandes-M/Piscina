@@ -1,4 +1,5 @@
 import './assets/main.css'
+import { registerSW } from 'virtual:pwa-register'
 
 import { createApp } from 'vue'
 import App from './App.vue'
@@ -12,5 +13,4 @@ app.use(store)
 
 app.mount('#app')
 
-import { registerSW } from 'virtual:pwa-register'
 registerSW({ immediate: true })
