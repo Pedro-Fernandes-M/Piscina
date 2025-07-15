@@ -364,7 +364,7 @@ const store = createStore({
       let response = null
       try {
         if (payload.options == 'quartos') {
-          spreadsheetId1 = getters['defenicoes/getEspaco'] || import.meta.env.VITE_SPREADSHEET_ID_2
+          spreadsheetId1 = getters['defenicoes/getEspacos'] || import.meta.env.VITE_SPREADSHEET_ID_2
           response = await gapi.client.sheets.spreadsheets.values.get({
             spreadsheetId: spreadsheetId1,
             range: `${payload.ano}!A:J`,
