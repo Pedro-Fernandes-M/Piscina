@@ -96,6 +96,7 @@ const guardar = () => {
   gap: 1rem;
   width: 65%;
   max-width: 20rem;
+  text-align: left;
 }
 .grid1 {
   display: grid;
