@@ -6,7 +6,7 @@ import { onBeforeUnmount, ref } from 'vue'
 
 const store = useStore()
 
-document.addEventListener('contextmenu', (event) => event.preventDefault())
+/* document.addEventListener('contextmenu', (event) => event.preventDefault())
 
 // Disable F12, Ctrl+Shift+I
 document.addEventListener('keydown', (event) => {
@@ -55,7 +55,7 @@ function stopApp() {
 }
 
 // Call the detection function
-detectDevTools()
+detectDevTools() */
 
 store.dispatch('defenicoes/getSettings')
 
@@ -91,6 +91,7 @@ const onTouchEnd = (e) => {
 function clearStorage() {
   localStorage.removeItem('logs')
   localStorage.removeItem('logs1')
+  localStorage.removeItem('logs2')
 }
 </script>
 
