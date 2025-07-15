@@ -441,6 +441,6 @@ button {
 .arrow {
   width: 100%;
   text-align: left;
-  padding: 1.5rem 1.5rem 0.2rem 1.5rem;
+  padding: 1.5rem 1.5rem 0.4rem 1.5rem;
 }
 </style>

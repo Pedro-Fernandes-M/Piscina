@@ -83,7 +83,7 @@ const onTouchEnd = (e) => {
       store.commit('setPage', 'settings')
       router.push('/settings')
     } else if (store.getters.getPage === 'settings') {
-      router.push('/home')
+      router.push('/')
     }
   }
 }
