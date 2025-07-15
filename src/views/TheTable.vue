@@ -1,8 +1,9 @@
 <template>
   <div class="page">
-    <div class="form">
+    <div class="form margin-1">
       <div class="center">
-        <h2 @click="mudarSheet" class="text">
+        <h2 class="text" v-if="redirect">Espaços</h2>
+        <h2 @click="mudarSheet" class="text" v-else>
           {{ piscina }}
         </h2>
         <h3>{{ day }} de {{ month }}</h3>
@@ -10,31 +11,66 @@
       <div v-if="data" class="gap">
         <div v-for="(item, index) in data" :key="index">
           <div v-if="item.length > 0" class="grid">
-            <span class="grid1">
-              <span class="font"> Hora </span>
-              <br />
-              {{ item[0] }}
-            </span>
-            <span
-              v-for="(data, index1) in item.slice(1).filter((item) => item !== 'Filipe Fernandes')"
-              :key="index1"
-              :class="[header[index1] === 'Obs.' ? 'grid2' : '']"
-            >
-              <span class="weight">
-                {{ header[index1] }}
+            <span class="grid1 margin">
+              <span class="font" v-if="redirect"
+                >Local
+                <span>
+                  {{ item[1] }}
+                </span>
               </span>
-              <br />
-              {{ data == '' ? '--' : data }}
+              <span class="font" v-else>
+                Hora
+                <span>
+                  {{ item[0] }}
+                </span>
+              </span>
             </span>
-            <span class="grid1">
-              <span class="font"> Responsável </span>
-              <br />
-              {{
-                item[item.length - 1] === 'Filipe Fernandes'
-                  ? item[item.length - 1]
-                  : item[item.length - 2]
-              }}
-            </span>
+            <div v-if="redirect" class="grid2 grid3">
+              <span
+                v-for="(data, index1) in item
+                  .slice(2)
+                  .filter((item) => item !== 'Filipe Fernandes')"
+                :key="index1"
+                :class="[header1[index1] === 'Comentários' ? 'grid2' : '']"
+              >
+                <span class="weight">
+                  {{ header1[index1] }}
+                </span>
+                <br />
+                {{ data == '' ? '--' : data }}
+              </span>
+              <span class="grid1">
+                <span class="font"> Responsável </span>
+                {{
+                  item[item.length - 1] === 'Filipe Fernandes'
+                    ? item[item.length - 1]
+                    : item[item.length - 2]
+                }}
+              </span>
+            </div>
+            <div v-else class="grid2 grid3">
+              <span
+                v-for="(data, index1) in item
+                  .slice(1)
+                  .filter((item) => item !== 'Filipe Fernandes')"
+                :key="index1"
+                :class="[header[index1] === 'Obs.' ? 'grid2' : '']"
+              >
+                <span class="weight">
+                  {{ header[index1] }}
+                </span>
+                <br />
+                {{ data == '' ? '--' : data }}
+              </span>
+              <span class="grid1">
+                <span class="font"> Responsável </span>
+                {{
+                  item[item.length - 1] === 'Filipe Fernandes'
+                    ? item[item.length - 1]
+                    : item[item.length - 2]
+                }}
+              </span>
+            </div>
             <button class="button" @click="alert(index)">
               <div class="forma">
                 <IconTrash />
@@ -71,17 +107,26 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
+import { useRoute } from 'vue-router'
 import SpinnerCard from '@/components/SpinnerCard.vue'
 import IconTrash from '@/components/icons/IconTrash.vue'
-import { router } from '@/router'
+import { previousRoute, router } from '@/router'
 import AlertCard from '@/components/AlertCard.vue'
 import IconEdit from '@/components/icons/IconEdit.vue'
 
 const store = useStore()
+const route = useRoute()
 
 const spinner = computed(() => {
   return store.getters.getSpinner
 })
+
+const redirect = ref(false)
+if (previousRoute.value?.path === '/quartos' && route.path === '/table') {
+  redirect.value = true
+}
+
+console.log(redirect.value)
 
 const piscina = computed(() => {
   return store.getters.getPiscina
@@ -106,10 +151,22 @@ const monthNames = [
   'Dezembro',
 ]
 const month = monthNames[new Date().getMonth()]
-store.dispatch('lerPlanilha', {
-  dia: day,
-  mes: month,
-})
+
+if (redirect.value) {
+  store.dispatch('lerPlanilha', {
+    dia: day,
+    mes: new Date().getMonth() + 1,
+    ano: new Date().getFullYear(),
+    options: 'quartos',
+  })
+  console.log('quartos')
+} else {
+  store.dispatch('lerPlanilha', {
+    dia: day,
+    mes: month,
+    options: 'piscina',
+  })
+}
 
 const header = ref([
   'Ph',
@@ -122,12 +179,25 @@ const header = ref([
   'Filtros',
   'Obs.',
 ])
+const header1 = ref([
+  'Temperatura',
+  'Cloro',
+  'pH',
+  'Temperatura',
+  'Cloro',
+  'pH',
+  'Comentários',
+  'Assinatura',
+])
+
 const data = computed(() => {
   const values = []
   if (store.getters.getTabela.length > 0) {
     for (let i = 0; i < store.getters.getTabela.length; i++) {
       values.push(store.getters.getTabela[i])
     }
+  } else if (redirect.value) {
+    return JSON.parse(localStorage.getItem('logs2'))
   } else if (store.getters.getPiscina === 'Piscina Interior') {
     return JSON.parse(localStorage.getItem('logs'))
   } else {
@@ -137,12 +207,24 @@ const data = computed(() => {
 })
 
 async function lerDados() {
-  const input = {
-    dia: day,
-    mes: month,
-    btn: true,
+  if (redirect.value) {
+    const input = {
+      dia: day,
+      mes: new Date().getMonth() + 1,
+      ano: new Date().getFullYear(),
+      options: 'quartos',
+      btn: true,
+    }
+    await store.dispatch('lerPlanilha', input)
+  } else {
+    const input = {
+      dia: day,
+      mes: month,
+      options: 'piscina',
+      btn: true,
+    }
+    await store.dispatch('lerPlanilha', input)
   }
-  await store.dispatch('lerPlanilha', input)
 }
 
 function mudarSheet() {
@@ -153,6 +235,7 @@ function mudarSheet() {
       store.dispatch('lerPlanilha', {
         dia: day,
         mes: month,
+        options: 'piscina',
       })
     }
   } else {
@@ -162,31 +245,55 @@ function mudarSheet() {
       store.dispatch('lerPlanilha', {
         dia: day,
         mes: month,
+        options: 'piscina',
       })
     }
   }
 }
+let del = false
 
 function alert(index1) {
-  index.value = index1
-  store.commit('alert/setBtn', 'confirm')
-  store.commit(
-    'alert/setText',
-    `Pretende apagar o registo da planilha - ${store.getters.getPiscina}?`,
-  )
-  store.commit('alert/setAlert')
+  if (redirect.value) {
+    index.value = index1
+    store.commit('alert/setBtn', 'confirm')
+    store.commit(
+      'alert/setText',
+      `Pretende apagar o registo da planilha - Controlo Água Potável Legionela - Espaços?`,
+    )
+    store.commit('alert/setAlert')
+    del = true
+  } else {
+    index.value = index1
+    store.commit('alert/setBtn', 'confirm')
+    store.commit(
+      'alert/setText',
+      `Pretende apagar o registo da planilha - ${store.getters.getPiscina}?`,
+    )
+    store.commit('alert/setAlert')
+  }
 }
 
 function alert1(index1, edit1) {
   index.value = index1
-  edit.value = edit1
-  store.commit('setEdit', true)
-  store.commit('alert/setBtn', 'confirm')
-  store.commit(
-    'alert/setText',
-    `Pretende editar o registo da planilha - ${store.getters.getPiscina}?`,
-  )
-  store.commit('alert/setAlert')
+  if (redirect.value) {
+    store.commit('setEdit', true)
+    store.commit('alert/setBtn', 'confirm')
+    store.commit(
+      'alert/setText',
+      `Pretende editar o registo da planilha - Controlo Água Potável Legionela - Espaços?`,
+    )
+    store.commit('alert/setAlert')
+    del = false
+  } else {
+    edit.value = edit1
+    store.commit('setEdit', true)
+    store.commit('alert/setBtn', 'confirm')
+    store.commit(
+      'alert/setText',
+      `Pretende editar o registo da planilha - ${store.getters.getPiscina}?`,
+    )
+    store.commit('alert/setAlert')
+  }
 }
 
 const response = computed(() => store.getters['alert/getResponse'])
@@ -196,7 +303,20 @@ watch(response, async (novo) => {
     await store.dispatch('deleteLog', { mes: month, index: index.value, dia: day, del: false })
     store.commit('alert/setResponse', null)
     edit.value = false
-    router.push('/')
+    router.push('/piscina')
+  } else if (novo && redirect.value) {
+    store.commit('setChange', data.value[index.value])
+    store.dispatch('deleteLog', {
+      ano: new Date().getFullYear(),
+      index: index.value,
+      dia: day,
+      del: false,
+      options: 'quartos',
+    })
+    if (del == false) {
+      router.push('/quartos')
+    }
+    store.commit('alert/setResponse', null)
   } else if (novo) {
     store.dispatch('deleteLog', { mes: month, index: index.value, dia: day, del: true })
     store.commit('alert/setResponse', null)
@@ -249,10 +369,13 @@ watch(response, async (novo) => {
 .grid1 {
   grid-column: 1 / span 2;
   color: aliceblue;
-  margin-top: 0.5rem;
 }
 .grid2 {
   grid-column: 1 / span 2;
+}
+.grid3 {
+  display: grid;
+  gap: 0.8rem;
 }
 .button {
   display: flex;
@@ -270,6 +393,9 @@ watch(response, async (novo) => {
   border-radius: 0.5rem;
   cursor: pointer;
 }
+.margin-1 {
+  margin-top: 2rem;
+}
 
 .weight {
   font-weight: 580;
@@ -279,6 +405,7 @@ watch(response, async (novo) => {
 .font {
   font-weight: 900;
   color: aliceblue;
+  display: grid;
 }
 .forma {
   display: flex;
@@ -288,6 +415,11 @@ watch(response, async (novo) => {
 .gap {
   display: grid;
   gap: 0.8rem;
+}
+
+.margin {
+  margin-bottom: 0.4rem;
+  margin-top: 0.4rem;
 }
 
 .btn-color {

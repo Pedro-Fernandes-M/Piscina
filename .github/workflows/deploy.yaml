@@ -30,6 +30,7 @@ jobs:
           VITE_API_KEY: ${{ secrets.VITE_API_KEY }}
           VITE_SPREADSHEET_ID: ${{ secrets.VITE_SPREADSHEET_ID }}
           VITE_SPREADSHEET_ID_1: ${{ secrets.VITE_SPREADSHEET_ID_1 }}
+          VITE_SPREADSHEET_ID_2: ${{ secrets.VITE_SPREADSHEET_ID_2 }}
           VITE_CLIENT_ID: ${{ secrets.VITE_CLIENT_ID }}
 
       - name: Deploy to GitHub Pages

@@ -1,6 +1,7 @@
 import { createStore } from 'vuex'
 import { gapi } from 'gapi-script'
 import alert from './alert'
+import defenicoes from './defenicoes'
 
 const store = createStore({
   state: {
@@ -84,7 +85,7 @@ const store = createStore({
     },
   },
   actions: {
-    solicitarToken({ commit }) {
+    solicitarToken({ getters, commit }) {
       return new Promise((resolve, reject) => {
         let finished = false
 
@@ -100,7 +101,7 @@ const store = createStore({
         }, 12000) // 30 segundos de timeout
 
         const tokenClient = window.google.accounts.oauth2.initTokenClient({
-          client_id: import.meta.env.VITE_CLIENT_ID,
+          client_id: getters['defenicoes/getClient_ID'] || import.meta.env.VITE_CLIENT_ID,
           scope: 'https://www.googleapis.com/auth/spreadsheets',
           callback: (tokenResponse) => {
             if (finished) return // ignora chamadas tardias
@@ -144,11 +145,14 @@ const store = createStore({
         }
       }
 
-      const apiKey = import.meta.env.VITE_API_KEY
+      const apiKey = getters['defenicoes/getAPI_Key'] || import.meta.env.VITE_API_KEY
       const spreadsheetId =
         store.getters.getPiscina === 'Piscina Interior'
-          ? import.meta.env.VITE_SPREADSHEET_ID
-          : import.meta.env.VITE_SPREADSHEET_ID_1
+          ? getters['defenicoes/getPiscInt'] || import.meta.env.VITE_SPREADSHEET_ID
+          : getters['defenicoes/getPiscExt'] || import.meta.env.VITE_SPREADSHEET_ID_1
+
+      const spreadsheetId1 =
+        getters['defenicoes/getEspaco'] || import.meta.env.VITE_SPREADSHEET_ID_2
 
       // Inicializa gapi client
       await new Promise((resolve) => gapi.load('client', resolve))
@@ -160,72 +164,123 @@ const store = createStore({
       gapi.client.setToken({ access_token: getters.getGoogleCredential })
 
       try {
-        const readDias = await gapi.client.sheets.spreadsheets.values.get({
-          spreadsheetId,
-          range: `${payload.mes}!D:D`,
-        })
-        const dias = readDias.result.values || []
-        // Lê a coluna F para verificar células vazias
-        const readColF = await gapi.client.sheets.spreadsheets.values.get({
-          spreadsheetId,
-          range: `${payload.mes}!F:F`,
-        })
-        const colF = readColF.result.values || []
+        let range = null
+        let values = null
+        if (payload.options == 'piscina') {
+          const readDias = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId,
+            range: `${payload.mes}!D:D`,
+          })
+          const dias = readDias.result.values || []
+          // Lê a coluna F para verificar células vazias
+          const readColF = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId,
+            range: `${payload.mes}!F:F`,
+          })
+          const colF = readColF.result.values || []
 
-        // Filtra índices das linhas onde o dia bate com payload.dia
-        const linhaDoDia = dias
-          .map((row, idx) => ({ idx, dia: row[0] }))
-          .filter((item) => item.dia == String(payload.dia))
-          .map((item) => item.idx)
+          // Filtra índices das linhas onde o dia bate com payload.dia
+          const linhaDoDia = dias
+            .map((row, idx) => ({ idx, dia: row[0] }))
+            .filter((item) => item.dia == String(payload.dia))
+            .map((item) => item.idx)
 
-        const linhasDoDia = [
-          linhaDoDia,
-          (Number(linhaDoDia) + 1).toString(),
-          (Number(linhaDoDia) + 2).toString(),
-          (Number(linhaDoDia) + 3).toString(),
-        ]
-        // Procura a primeira linha do dia com coluna F vazia
-        const linhaParaEscreverIdx = linhasDoDia.find((i) => {
-          return !colF[i] || colF[i][0] === '' || colF[i][0] == null
-        })
+          const linhasDoDia = [
+            linhaDoDia,
+            (Number(linhaDoDia) + 1).toString(),
+            (Number(linhaDoDia) + 2).toString(),
+            (Number(linhaDoDia) + 3).toString(),
+          ]
+          // Procura a primeira linha do dia com coluna F vazia
+          const linhaParaEscreverIdx = linhasDoDia.find((i) => {
+            return !colF[i] || colF[i][0] === '' || colF[i][0] == null
+          })
 
-        if (linhaParaEscreverIdx === undefined) {
-          commit('alert/setBtn', 'alert')
-          commit(
-            'alert/setText',
-            `Não encontrou linha vazia na coluna F para o dia ${payload.dia}.`,
-          )
-          commit('alert/setAlert')
-          console.error('Não encontrou linha vazia na coluna F para o dia', payload.dia)
-          commit('setSpinner', !getters.getSpinner)
-          const response = { status: 399 }
-          return response
+          if (linhaParaEscreverIdx === undefined) {
+            commit('alert/setBtn', 'alert')
+            commit(
+              'alert/setText',
+              `Não encontrou linha vazia na coluna F para o dia ${payload.dia}.`,
+            )
+            commit('alert/setAlert')
+            console.error('Não encontrou linha vazia na coluna F para o dia', payload.dia)
+            commit('setSpinner', !getters.getSpinner)
+            const response = { status: 399 }
+            return response
+          }
+
+          const linhaParaEscrever = (Number(linhaParaEscreverIdx) + 1).toString()
+
+          // Define o range e os valores para atualizar
+          range = `${payload.mes}!F${linhaParaEscrever}:P${linhaParaEscrever}`
+          values = [
+            [
+              payload.horas.value,
+              payload.ph.value,
+              payload.temperatura_agua.value,
+              payload.residual_desinfetante,
+              payload.total_residual,
+              payload.transparencia.value,
+              payload.num_banhistas.value,
+              payload.volume.value === 0 ? '' : payload.volume.value,
+              payload.lavagem_filtros.value,
+              'Filipe Fernandes',
+              payload.observacoes.value,
+            ],
+          ]
+        } else {
+          const readRes = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: spreadsheetId1,
+            range: `${payload.ano}!A:A`,
+          })
+
+          console.log(readRes)
+          const rows = readRes.result.values || []
+          console.log(rows)
+          const firstEmptyIndex = rows.findIndex((row, index) => {
+            if (index <= 1) return false // ignora índice 0 e 1 (linhas 3 e 4)
+            return !row[0] || row[0].trim() === ''
+          })
+          console.log(firstEmptyIndex)
+          // Como estamos começando a leitura a partir da linha 3, ajustamos o índice
+          const rowNumber =
+            firstEmptyIndex >= 0
+              ? firstEmptyIndex + 1
+              : rows.length < 2
+                ? rows.length + 2
+                : rows.length + 1
+          console.log(rowNumber)
+          // Define a faixa e os valores a escrever
+          range = `${payload.ano}!A${rowNumber}:J${rowNumber}`
+          values = [
+            [
+              payload.data,
+              payload.quarto,
+              payload.temp_quente,
+              payload.cloro_quente < 0.1 ? 'Low' : payload.cloro_quente,
+              payload.ph_quente,
+              payload.temp_fria,
+              payload.cloro_fria < 0.1 ? 'Low' : payload.cloro_fria,
+              payload.ph_fria,
+              payload.comentarios,
+              getters['defenicoes/getAssinatura'] || 'Filipe Fernandes',
+            ],
+          ]
         }
 
-        const linhaParaEscrever = (Number(linhaParaEscreverIdx) + 1).toString()
-
-        // Define o range e os valores para atualizar
-        const range = `${payload.mes}!F${linhaParaEscrever}:P${linhaParaEscrever}`
-        const values = [
-          [
-            payload.horas.value,
-            payload.ph.value,
-            payload.temperatura_agua.value,
-            payload.residual_desinfetante,
-            payload.total_residual,
-            payload.transparencia.value,
-            payload.num_banhistas.value,
-            payload.volume.value === 0 ? '' : payload.volume.value,
-            payload.lavagem_filtros.value,
-            'Filipe Fernandes',
-            payload.observacoes.value,
-          ],
-        ]
-
-        const params = {
-          spreadsheetId,
-          range,
-          valueInputOption: 'RAW',
+        let params = {}
+        if (payload.options == 'quartos') {
+          params = {
+            spreadsheetId: spreadsheetId1,
+            range,
+            valueInputOption: 'RAW',
+          }
+        } else {
+          params = {
+            spreadsheetId,
+            range,
+            valueInputOption: 'RAW',
+          }
         }
 
         const resource = { values }
@@ -290,11 +345,11 @@ const store = createStore({
         }
       }
 
-      const apiKey = import.meta.env.VITE_API_KEY
+      const apiKey = getters['defenicoes/getAPI_Key'] || import.meta.env.VITE_API_KEY
       const spreadsheetId =
         store.getters.getPiscina === 'Piscina Interior'
-          ? import.meta.env.VITE_SPREADSHEET_ID
-          : import.meta.env.VITE_SPREADSHEET_ID_1
+          ? getters['defenicoes/getPiscInt'] || import.meta.env.VITE_SPREADSHEET_ID
+          : getters['defenicoes/getPiscExt'] || import.meta.env.VITE_SPREADSHEET_ID_1
 
       // Inicializa gapi client
       await new Promise((resolve) => gapi.load('client', resolve))
@@ -305,48 +360,85 @@ const store = createStore({
 
       gapi.client.setToken({ access_token: getters.getGoogleCredential })
 
+      let range = null
+      let spreadsheetId1 = null
+      let response = null
       try {
-        const readDias = await gapi.client.sheets.spreadsheets.values.get({
-          spreadsheetId,
-          range: `${payload.mes}!D:D`,
-        })
-        const dias = readDias.result.values || []
+        if (payload.options == 'quartos') {
+          spreadsheetId1 = getters['defenicoes/getEspaco'] || import.meta.env.VITE_SPREADSHEET_ID_2
+          response = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: spreadsheetId1,
+            range: `${payload.ano}!A:J`,
+          })
 
-        // Filtra índices das linhas onde o dia bate com payload.dia
-        const linhaDoDia = dias
-          .map((row, idx) => ({ idx, dia: row[0] }))
-          .filter((item) => item.dia == String(payload.dia))
-          .map((item) => item.idx)
+          const linhas = response.result.values || []
 
-        const linhasTotais = [
-          linhaDoDia[0] + 1,
-          linhaDoDia[0] + 2,
-          linhaDoDia[0] + 3,
-          linhaDoDia[0] + 4,
-        ]
+          // Filtra as linhas e guarda os índices reais
+          const linhasFiltradas = linhas
+            .map((row, index) => ({ row, index }))
+            .filter(({ row }) => row[0] === `${payload.dia}/${payload.mes}`)
 
-        if (linhasTotais.length === 0) {
-          console.error('Não encontrou linhas para o dia', payload.dia)
-          commit('alert/setBtn', 'alert')
-          commit('alert/setText', 'Não encontrou linhas para o dia')
-          commit('alert/setAlert')
-          commit('setSpinner', !getters.getSpinner)
-          return { status: 400 }
+          const respostaFiltrada = {
+            ...response,
+            result: {
+              ...response.result,
+              values: linhasFiltradas.map(({ row }) => row),
+            },
+          }
+
+          // Só os números das linhas reais (lembrando do +1 pois começa em 1 no Sheets)
+          const linhasIdx = linhasFiltradas.map(({ index }) => index + 1)
+          console.log(linhasIdx)
+          commit('setLinhas', linhasIdx)
+
+          response = respostaFiltrada
         } else {
-          commit('setLinhas', linhasTotais)
+          const readDias = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId,
+            range: `${payload.mes}!D:D`,
+          })
+          const dias = readDias.result.values || []
+
+          // Filtra índices das linhas onde o dia bate com payload.dia
+          const linhaDoDia = dias
+            .map((row, idx) => ({ idx, dia: row[0] }))
+            .filter((item) => item.dia == String(payload.dia))
+            .map((item) => item.idx)
+
+          const linhasTotais = [
+            linhaDoDia[0] + 1,
+            linhaDoDia[0] + 2,
+            linhaDoDia[0] + 3,
+            linhaDoDia[0] + 4,
+          ]
+
+          if (linhasTotais.length === 0) {
+            console.error('Não encontrou linhas para o dia', payload.dia)
+            commit('alert/setBtn', 'alert')
+            commit('alert/setText', 'Não encontrou linhas para o dia')
+            commit('alert/setAlert')
+            commit('setSpinner', !getters.getSpinner)
+            return { status: 400 }
+          } else {
+            commit('setLinhas', linhasTotais)
+          }
+
+          range = `${payload.mes}!F${linhasTotais[0]}:P${linhasTotais[linhasTotais.length - 1]}`
+
+          const id = spreadsheetId1 === null ? spreadsheetId : spreadsheetId1
+          response = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: id,
+            range,
+          })
         }
-
-        const range = `${payload.mes}!F${linhasTotais[0]}:P${linhasTotais[linhasTotais.length - 1]}`
-
-        const response = await gapi.client.sheets.spreadsheets.values.get({
-          spreadsheetId,
-          range,
-        })
 
         if (response.status === 200) {
           const dadosLinhas = response.result.values || []
           commit('setTabela', dadosLinhas)
-          if (store.getters.getPiscina === 'Piscina Interior') {
+          console.log(payload)
+          if (payload.options == 'quartos') {
+            localStorage.setItem('logs2', JSON.stringify(dadosLinhas))
+          } else if (store.getters.getPiscina === 'Piscina Interior') {
             localStorage.setItem('logs', JSON.stringify(dadosLinhas))
           } else {
             localStorage.setItem('logs1', JSON.stringify(dadosLinhas))
@@ -391,11 +483,14 @@ const store = createStore({
         }
       }
 
-      const apiKey = import.meta.env.VITE_API_KEY
+      const apiKey = getters['defenicoes/getAPI_Key'] || import.meta.env.VITE_API_KEY
       const spreadsheetId =
         store.getters.getPiscina === 'Piscina Interior'
-          ? import.meta.env.VITE_SPREADSHEET_ID
-          : import.meta.env.VITE_SPREADSHEET_ID_1
+          ? getters['defenicoes/getPiscInt'] || import.meta.env.VITE_SPREADSHEET_ID
+          : getters['defenicoes/getPiscExt'] || import.meta.env.VITE_SPREADSHEET_ID_1
+      const spreadsheetId1 =
+        getters['defenicoes/getEspaco'] || import.meta.env.VITE_SPREADSHEET_ID_2
+
       // Inicializa gapi client
       await new Promise((resolve) => gapi.load('client', resolve))
       await gapi.client.init({
@@ -403,12 +498,21 @@ const store = createStore({
         discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
       })
 
-      const linha = getters.getLinhas[payload.index] // Número da linha real na planilha (1-based)
-      const range = `${payload.mes}!F${linha}:P${linha}` // Apagar colunas F a P nessa linha
+      let linha = null
+      let range = null
+      if (payload.options == 'quartos') {
+        linha = getters.getLinhas[payload.index]
+        console.log(linha)
+        range = `${payload.ano}!A${linha}:K${linha}`
+      } else {
+        linha = getters.getLinhas[payload.index]
+        range = `${payload.mes}!F${linha}:P${linha}`
+      }
 
+      const id = payload.options == 'quartos' ? spreadsheetId1 : spreadsheetId
       try {
         await gapi.client.sheets.spreadsheets.values.update({
-          spreadsheetId: spreadsheetId,
+          spreadsheetId: id,
           range: range,
           valueInputOption: 'RAW',
           resource: {
@@ -422,7 +526,20 @@ const store = createStore({
         }
 
         try {
-          await dispatch('lerPlanilha', { mes: payload.mes, dia: payload.dia })
+          if (payload.options == 'quartos') {
+            await dispatch('lerPlanilha', {
+              dia: new Date().getDate(),
+              mes: new Date().getMonth() + 1,
+              ano: new Date().getFullYear(),
+              options: 'quartos',
+            })
+          } else {
+            await dispatch('lerPlanilha', {
+              mes: payload.mes,
+              dia: payload.dia,
+              options: 'piscina',
+            })
+          }
         } catch (error) {
           commit('alert/setBtn', 'alert')
           commit('alert/setText', 'Erro ao apagar linha:' + error)
@@ -437,6 +554,7 @@ const store = createStore({
   },
   modules: {
     alert: alert,
+    defenicoes: defenicoes,
   },
 })
 

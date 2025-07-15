@@ -1,5 +1,8 @@
 <template>
   <div class="page">
+    <div class="arrow">
+      <IconBack @click="router.push('/')"></IconBack>
+    </div>
     <form action="" class="form">
       <div class="center">
         <h2 @click="mudarSheet">
@@ -37,6 +40,7 @@
       </div>
       <div class="input">
         <label for="">Transparência</label>
+        <br />
         <select
           name="transparencia"
           v-model="transparencia"
@@ -48,6 +52,7 @@
       </div>
       <div class="input">
         <label for="">Lavagem Filtros</label>
+        <br />
         <select
           name="lavagem_filtros"
           v-model="lavagem_filtros"
@@ -97,9 +102,10 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import SpinnerCard from '@/components/SpinnerCard.vue'
-import { previousRoute } from '@/router'
+import { previousRoute, router } from '@/router'
 import { useRoute } from 'vue-router'
 import AlertCard from '@/components/AlertCard.vue'
+import IconBack from '@/components/icons/IconBack.vue'
 
 const store = useStore()
 const route = useRoute()
@@ -109,7 +115,7 @@ const spinner = computed(() => {
 })
 
 const redirect = ref(false)
-if (previousRoute.value?.path === '/table' && route.path === '/' && store.getters.getEdit) {
+if (previousRoute.value?.path === '/table' && route.path === '/piscina' && store.getters.getEdit) {
   redirect.value = true
 }
 
@@ -337,6 +343,7 @@ async function preencher() {
     mes: month,
     dia: day,
     btn: true,
+    options: 'piscina',
   }
   try {
     const response = await store.dispatch('preencherSheet', form)
@@ -380,6 +387,8 @@ h2 {
   display: grid;
   margin-top: 0.5rem;
   padding-bottom: 1rem;
+  text-align: left;
+  display: block;
 }
 
 input {
@@ -404,6 +413,7 @@ input:focus {
 }
 
 select {
+  width: 100%;
   background-color: #444; /* fundo escuro */
   color: #f0f0f0; /* texto claro */
   padding: 10px 14px;
@@ -427,10 +437,10 @@ button {
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
-  transition: background 0.2s ease;
 }
-
-button:hover {
-  background-color: #0097a7;
+.arrow {
+  width: 100%;
+  text-align: left;
+  padding: 1.5rem 1.5rem 0 1.5rem;
 }
 </style>

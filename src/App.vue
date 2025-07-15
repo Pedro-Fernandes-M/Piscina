@@ -1,12 +1,48 @@
 <script setup>
 import { RouterView } from 'vue-router'
 import { useStore } from 'vuex'
-import { router } from './router'
-import { onBeforeMount, ref } from 'vue'
+import { previousRoute, router } from './router'
+import { onBeforeUnmount, ref } from 'vue'
 
 const store = useStore()
 
-document.addEventListener('contextmenu', (event) => event.preventDefault())
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistration().then((reg) => {
+    if (reg) {
+      requestAndNotify()
+      console.log('Service Worker is registered:', reg)
+    } else {
+      console.log('No Service Worker registered yet.')
+    }
+  })
+} else {
+  console.log('Service Worker not supported')
+}
+
+async function requestAndNotify() {
+  if (Notification.permission === 'default') {
+    const permission = await Notification.requestPermission()
+    if (permission !== 'granted') {
+      console.log('Notification permission denied')
+      return
+    }
+  }
+
+  if (Notification.permission === 'granted') {
+    console.log('oi')
+    const registration = await navigator.serviceWorker.ready
+    console.log('oi')
+    setTimeout(() => {
+      registration.showNotification('Test Notification', {
+        body: 'This is a test notification 30 seconds after app start',
+        icon: '',
+        tag: 'test-notification',
+      })
+    }, 300)
+  }
+}
+
+/* document.addEventListener('contextmenu', (event) => event.preventDefault())
 
 // Disable F12, Ctrl+Shift+I
 document.addEventListener('keydown', (event) => {
@@ -55,7 +91,13 @@ function stopApp() {
 }
 
 // Call the detection function
-detectDevTools()
+detectDevTools() */
+
+store.dispatch('defenicoes/getSettings')
+
+onBeforeUnmount(() => {
+  clearStorage()
+})
 
 const touchStartX = ref(0)
 const touchEndX = ref(0)
@@ -67,12 +109,17 @@ const onTouchStart = (e) => {
 const onTouchEnd = (e) => {
   touchEndX.value = e.changedTouches[0].screenX
   if (touchStartX.value - touchEndX.value > 150 || touchEndX.value - touchStartX.value > 150) {
-    if (store.getters.getPage === 'home') {
+    if (store.getters.getPage === 'piscina' || store.getters.getPage === 'quarto') {
       store.commit('setPage', 'table')
-      router.push('/')
-    } else {
-      store.commit('setPage', 'home')
       router.push('/table')
+    } else if (store.getters.getPage === 'table') {
+      store.commit('setPage', 'table')
+      router.push(`${previousRoute.value?.path}`)
+    } else if (store.getters.getPage === 'home') {
+      store.commit('setPage', 'settings')
+      router.push('/settings')
+    } else if (store.getters.getPage === 'settings') {
+      router.push('/home')
     }
   }
 }
@@ -81,8 +128,6 @@ function clearStorage() {
   localStorage.removeItem('logs')
   localStorage.removeItem('logs1')
 }
-
-onBeforeMount(clearStorage)
 </script>
 
 <template>

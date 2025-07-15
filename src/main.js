@@ -11,3 +11,6 @@ app.use(router)
 app.use(store)
 
 app.mount('#app')
+
+import { registerSW } from 'virtual:pwa-register'
+registerSW({ immediate: true })

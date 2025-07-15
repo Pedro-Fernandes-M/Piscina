@@ -1,16 +1,19 @@
 {
-  "name": "Piscina",
-  "short_name": "Piscina",
-  "description": "A modern app",
+  "name": "Registos",
+  "short_name": "Registos",
+  "description": "App para registo e controlo de Legionella em piscinas e quartos.",
   "start_url": "/Piscina/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#181818",
   "theme_color": "#181818",
   "icons": [
     {
-      "src": "image.ico",
+      "src": "logo.ico",
       "sizes": "192x192",
       "type": "image/png"
     }
-  ]
+  ],
+  "lang": "pt-PT",
+  "dir": "ltr"
 }
