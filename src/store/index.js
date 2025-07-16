@@ -152,7 +152,7 @@ const store = createStore({
           : getters['defenicoes/getPiscExt'] || import.meta.env.VITE_SPREADSHEET_ID_1
 
       const spreadsheetId1 =
-        getters['defenicoes/getEspaco'] || import.meta.env.VITE_SPREADSHEET_ID_2
+        getters['defenicoes/getEspacos'] || import.meta.env.VITE_SPREADSHEET_ID_2
 
       // Inicializa gapi client
       await new Promise((resolve) => gapi.load('client', resolve))
@@ -224,7 +224,7 @@ const store = createStore({
               payload.num_banhistas.value,
               payload.volume.value === 0 ? '' : payload.volume.value,
               payload.lavagem_filtros.value,
-              'Filipe Fernandes',
+              getters['defenicoes/getAssinatura'] || 'Filipe Fernandes',
               payload.observacoes.value,
             ],
           ]

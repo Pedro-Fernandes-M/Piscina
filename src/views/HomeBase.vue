@@ -6,7 +6,7 @@
     </button>
     <button @click="setPage(false)">
       <IconEspacos class="margin"></IconEspacos>
-      <h2>Espaços</h2>
+      <h2>Locais</h2>
     </button>
   </div>
 </template>

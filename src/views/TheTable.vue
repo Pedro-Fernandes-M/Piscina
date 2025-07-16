@@ -27,9 +27,7 @@
             </span>
             <div v-if="redirect" class="grid2 grid3">
               <span
-                v-for="(data, index1) in item
-                  .slice(2)
-                  .filter((item) => item !== 'Filipe Fernandes')"
+                v-for="(data, index1) in item.slice(2).filter((item) => item !== assinatura)"
                 :key="index1"
                 :class="[header1[index1] === 'Comentários' ? 'grid2' : '']"
               >
@@ -42,7 +40,7 @@
               <span class="grid1">
                 <span class="font"> Responsável </span>
                 {{
-                  item[item.length - 1] === 'Filipe Fernandes'
+                  item[item.length - 1] === assinatura
                     ? item[item.length - 1]
                     : item[item.length - 2]
                 }}
@@ -50,9 +48,7 @@
             </div>
             <div v-else class="grid2 grid3">
               <span
-                v-for="(data, index1) in item
-                  .slice(1)
-                  .filter((item) => item !== 'Filipe Fernandes')"
+                v-for="(data, index1) in item.slice(1).filter((item) => item !== assinatura)"
                 :key="index1"
                 :class="[header[index1] === 'Obs.' ? 'grid2' : '']"
               >
@@ -65,7 +61,7 @@
               <span class="grid1">
                 <span class="font"> Responsável </span>
                 {{
-                  item[item.length - 1] === 'Filipe Fernandes'
+                  item[item.length - 1] === assinatura
                     ? item[item.length - 1]
                     : item[item.length - 2]
                 }}
@@ -128,6 +124,10 @@ if (previousRoute.value?.path === '/quartos' && route.path === '/table') {
 
 const piscina = computed(() => {
   return store.getters.getPiscina
+})
+
+const assinatura = computed(() => {
+  return store.getters['defenicoes/getAssinatura'] || 'Filipe Fernandes'
 })
 
 const index = ref()

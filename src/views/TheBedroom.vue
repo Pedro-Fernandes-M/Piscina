@@ -210,7 +210,7 @@ function alert() {
     store.commit('alert/setBtn', 'confirm')
     store.commit(
       'alert/setText',
-      `Pretende efetuar registo na planilha - Controlo Água Potável Legionela - Espaços?`,
+      `Pretende efetuar registo na planilha - Controlo Água Potável - Legionela?`,
     )
     store.commit('alert/setAlert')
   } else {
@@ -218,7 +218,7 @@ function alert() {
     store.commit('alert/setBtn', 'confirm')
     store.commit(
       'alert/setText',
-      `Valores anormais detetados.\nPretende efetuar registo na planilha - Controlo Água Potável Legionela - Espaços, na mesma?`,
+      `Valores anormais detetados.\nPretende efetuar registo na planilha - Controlo Água Potável - Legionela, na mesma?`,
     )
     store.commit('alert/setAlert')
   }
