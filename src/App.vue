@@ -5,7 +5,7 @@ import { previousRoute, router } from './router'
 import { onBeforeUnmount, ref } from 'vue'
 
 const store = useStore()
-/* 
+
 document.addEventListener('contextmenu', (event) => event.preventDefault())
 
 // Disable F12, Ctrl+Shift+I
@@ -55,7 +55,7 @@ function stopApp() {
 }
 
 // Call the detection function
-detectDevTools() */
+detectDevTools()
 
 store.dispatch('defenicoes/getSettings')
 
