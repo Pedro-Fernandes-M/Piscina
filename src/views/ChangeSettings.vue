@@ -10,7 +10,12 @@
           :class="[change[id] == '' ? 'input-erro' : '']"
         />
       </div>
-      <button @click="guardar">Guardar</button>
+      <div :class="change.some((item) => item !== null) ? 'gap' : 'no-gap'">
+        <button @click="guardar">Guardar</button>
+        <button @click="apagar" class="button-1" v-if="change.some((item) => item !== null)">
+          Apagar
+        </button>
+      </div>
     </div>
     <transition name="fade-slide" mode="out-in">
       <SpinnerCard v-if="spinner"></SpinnerCard>
@@ -88,6 +93,10 @@ const guardar = () => {
     }
   }
 }
+
+const apagar = async () => {
+  await store.dispatch('defenicoes/reset')
+}
 </script>
 
 <style scoped>
@@ -121,13 +130,17 @@ input:focus {
 
 button {
   margin-top: 1rem;
-  padding: 10px 20px;
+  padding: 10px 30px;
   background-color: #00bcd4;
   color: white;
   border: none;
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
+}
+
+.button-1 {
+  background-color: #d40700;
 }
 
 .input-erro {
@@ -138,5 +151,16 @@ h2 {
   color: aliceblue;
   font-weight: 1000;
   margin-bottom: 0.8rem;
+}
+
+.gap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* optional: vertical alignment */
+  gap: 1rem; /* still applies if there are more elements */
+}
+.no-gap {
+  display: flex;
+  justify-content: center;
 }
 </style>

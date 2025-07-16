@@ -46,6 +46,7 @@ button {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: 36dvw;
 }
 
 h2 {
@@ -53,7 +54,7 @@ h2 {
 }
 
 .gap {
-  gap: 1.2rem;
+  gap: 1.5rem;
 }
 
 .page1 {

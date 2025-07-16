@@ -44,6 +44,7 @@ const defenicoes = {
       commit('setPiscExt', '')
       commit('setAssinatura', '')
       commit('setEspacos', '')
+      localStorage.removeItem('def')
     },
     setSettings({ commit }, payload) {
       commit('setAPI_Key', payload.API_Key || null)

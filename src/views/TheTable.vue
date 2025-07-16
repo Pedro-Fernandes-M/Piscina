@@ -1,6 +1,9 @@
 <template>
   <div class="page">
-    <div class="form margin-1">
+    <div class="arrow">
+      <IconBack @click="router.push('/')"></IconBack>
+    </div>
+    <div class="form">
       <div class="center">
         <h2 class="text" v-if="redirect">Espaços</h2>
         <h2 @click="mudarSheet" class="text" v-else>
@@ -109,6 +112,7 @@ import IconTrash from '@/components/icons/IconTrash.vue'
 import { previousRoute, router } from '@/router'
 import AlertCard from '@/components/AlertCard.vue'
 import IconEdit from '@/components/icons/IconEdit.vue'
+import IconBack from '@/components/icons/IconBack.vue'
 
 const store = useStore()
 const route = useRoute()
@@ -177,12 +181,12 @@ const header = ref([
   'Obs.',
 ])
 const header1 = ref([
-  'Temperatura',
-  'Cloro',
-  'pH',
-  'Temperatura',
-  'Cloro',
-  'pH',
+  'Temperatura(F)',
+  'Cloro(F)',
+  'pH(F)',
+  'Temperatura(F)',
+  'Cloro(F)',
+  'pH(F)',
   'Comentários',
   'Assinatura',
 ])
@@ -390,9 +394,6 @@ watch(response, async (novo) => {
   border-radius: 0.5rem;
   cursor: pointer;
 }
-.margin-1 {
-  margin-top: 2rem;
-}
 
 .weight {
   font-weight: 580;
@@ -417,6 +418,14 @@ watch(response, async (novo) => {
 .margin {
   margin-bottom: 0.4rem;
   margin-top: 0.4rem;
+}
+
+.arrow {
+  width: 100%;
+  text-align: left;
+  padding: 1.8rem 1.5rem 0 1.1rem;
+  position: absolute;
+  top: 0;
 }
 
 .btn-color {

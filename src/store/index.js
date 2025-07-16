@@ -488,7 +488,7 @@ const store = createStore({
           ? getters['defenicoes/getPiscInt'] || import.meta.env.VITE_SPREADSHEET_ID
           : getters['defenicoes/getPiscExt'] || import.meta.env.VITE_SPREADSHEET_ID_1
       const spreadsheetId1 =
-        getters['defenicoes/getEspaco'] || import.meta.env.VITE_SPREADSHEET_ID_2
+        getters['defenicoes/getEspacos'] || import.meta.env.VITE_SPREADSHEET_ID_2
 
       // Inicializa gapi client
       await new Promise((resolve) => gapi.load('client', resolve))
