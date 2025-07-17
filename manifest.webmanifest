@@ -1,1 +1,1 @@
-{"name":"piscina","short_name":"piscina","start_url":"/Piscina/","display":"standalone","background_color":"#ffffff","theme_color":"#42b883","lang":"en","scope":"/Piscina/"}
+{"name":"Registos","short_name":"Registos","description":"App para registo e controlo de Legionella em piscinas e quartos.","start_url":"/Piscina/","display":"standalone","background_color":"#181818","theme_color":"#181818","lang":"pt-PT","scope":"/Piscina/","orientation":"portrait","icons":[{"src":"logo.ico","sizes":"192x192","type":"image/png"}],"dir":"ltr"}
