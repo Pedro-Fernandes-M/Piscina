@@ -13,6 +13,7 @@ export default defineConfig({
     vueDevTools(),
     VitePWA({
       registerType: 'autoUpdate',
+      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
       includeAssets: ['logo.png'],
       devOptions: {
         enabled: false,
@@ -44,7 +45,6 @@ export default defineConfig({
             options: {
               cacheName: 'api-cache',
             },
-            globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
           },
         ],
       },
