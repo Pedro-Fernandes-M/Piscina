@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="arrow">
-      <IconBack @click="router.push('/')"></IconBack>
+      <IconBack @click="router.push('/home')"></IconBack>
     </div>
     <div class="form">
       <div class="center">
@@ -75,24 +75,11 @@
       </div>
       <button @click.prevent="alert" type="submit">Preencher</button>
     </div>
-    <transition name="fade-slide" mode="out-in">
-      <SpinnerCard v-if="spinner"></SpinnerCard>
-    </transition>
-    <transition name="fade-slide" mode="out-in">
-      <AlertCard
-        v-if="store.getters['alert/getAlert']"
-        :text="store.getters['alert/getText']"
-        :btn="store.getters['alert/getBtn']"
-        :choice="store.getters['alert/getChoice']"
-      ></AlertCard>
-    </transition>
   </div>
 </template>
 
 <script setup>
-import AlertCard from '@/components/AlertCard.vue'
 import IconBack from '@/components/icons/IconBack.vue'
-import SpinnerCard from '@/components/SpinnerCard.vue'
 import { previousRoute, router } from '@/router'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
@@ -100,10 +87,6 @@ import { useStore } from 'vuex'
 
 const store = useStore()
 const route = useRoute()
-
-const spinner = computed(() => {
-  return store.getters.getSpinner
-})
 
 store.commit('setPage', 'quarto')
 

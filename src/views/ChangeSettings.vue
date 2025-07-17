@@ -17,23 +17,10 @@
         </button>
       </div>
     </div>
-    <transition name="fade-slide" mode="out-in">
-      <SpinnerCard v-if="spinner"></SpinnerCard>
-    </transition>
-    <transition name="fade-slide" mode="out-in">
-      <AlertCard
-        v-if="store.getters['alert/getAlert']"
-        :text="store.getters['alert/getText']"
-        :btn="store.getters['alert/getBtn']"
-        :choice="store.getters['alert/getChoice']"
-      ></AlertCard>
-    </transition>
   </div>
 </template>
 
 <script setup>
-import AlertCard from '@/components/AlertCard.vue'
-import SpinnerCard from '@/components/SpinnerCard.vue'
 import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 
@@ -50,8 +37,8 @@ const settigns = [
 
 store.dispatch('defenicoes/getSettings')
 
-const spinner = computed(() => {
-  return store.getters.getSpinner
+const response = computed(() => {
+  return store.getters['alert/getResponse']
 })
 
 const change = ref([null, null, null, null, null, null])
@@ -95,8 +82,17 @@ const guardar = () => {
 }
 
 const apagar = async () => {
-  await store.dispatch('defenicoes/reset')
+  store.commit('alert/setResponse', null)
+  store.commit('alert/setBtn', 'confirm')
+  store.commit('alert/setText', `Pretende apagar as definições?`)
+  store.commit('alert/setAlert')
 }
+
+watch(response, async (novo) => {
+  if (novo) {
+    await store.dispatch('defenicoes/reset')
+  }
+})
 </script>
 
 <style scoped>

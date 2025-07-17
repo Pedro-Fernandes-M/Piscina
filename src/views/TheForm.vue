@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="arrow">
-      <IconBack @click="router.push('/')"></IconBack>
+      <IconBack @click="router.push('/home')"></IconBack>
     </div>
     <form action="" class="form">
       <div class="center">
@@ -84,35 +84,18 @@
       </div>
       <button @click.prevent="alert" type="submit">Preencher</button>
     </form>
-    <transition name="fade-slide" mode="out-in">
-      <SpinnerCard v-if="spinner"></SpinnerCard>
-    </transition>
-    <transition name="fade-slide" mode="out-in">
-      <AlertCard
-        v-if="store.getters['alert/getAlert']"
-        :text="store.getters['alert/getText']"
-        :btn="store.getters['alert/getBtn']"
-        :choice="store.getters['alert/getChoice']"
-      ></AlertCard>
-    </transition>
   </div>
 </template>
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
-import SpinnerCard from '@/components/SpinnerCard.vue'
 import { previousRoute, router } from '@/router'
 import { useRoute } from 'vue-router'
-import AlertCard from '@/components/AlertCard.vue'
 import IconBack from '@/components/icons/IconBack.vue'
 
 const store = useStore()
 const route = useRoute()
-
-const spinner = computed(() => {
-  return store.getters.getSpinner
-})
 
 const redirect = ref(false)
 if (previousRoute.value?.path === '/table' && route.path === '/piscina' && store.getters.getEdit) {

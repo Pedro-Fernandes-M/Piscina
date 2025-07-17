@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="arrow">
-      <IconBack @click="router.push('/')"></IconBack>
+      <IconBack @click="router.push('/home')"></IconBack>
     </div>
     <div class="form">
       <div class="center">
@@ -89,17 +89,6 @@
         <button @click="lerDados" class="button1">Refresh</button>
       </div>
     </div>
-    <transition name="fade-slide" mode="out-in">
-      <SpinnerCard v-if="spinner"></SpinnerCard>
-    </transition>
-    <transition name="fade-slide" mode="out-in">
-      <AlertCard
-        v-if="store.getters['alert/getAlert']"
-        :text="store.getters['alert/getText']"
-        :btn="store.getters['alert/getBtn']"
-        :choice="store.getters['alert/getChoice']"
-      ></AlertCard>
-    </transition>
   </div>
 </template>
 
@@ -107,19 +96,13 @@
 import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
-import SpinnerCard from '@/components/SpinnerCard.vue'
 import IconTrash from '@/components/icons/IconTrash.vue'
 import { previousRoute, router } from '@/router'
-import AlertCard from '@/components/AlertCard.vue'
 import IconEdit from '@/components/icons/IconEdit.vue'
 import IconBack from '@/components/icons/IconBack.vue'
 
 const store = useStore()
 const route = useRoute()
-
-const spinner = computed(() => {
-  return store.getters.getSpinner
-})
 
 const redirect = ref(false)
 if (previousRoute.value?.path === '/quartos' && route.path === '/table') {
@@ -181,9 +164,9 @@ const header = ref([
   'Obs.',
 ])
 const header1 = ref([
-  'Temperatura(F)',
-  'Cloro(F)',
-  'pH(F)',
+  'Temperatura(Q)',
+  'Cloro(Q)',
+  'pH(Q)',
   'Temperatura(F)',
   'Cloro(F)',
   'pH(F)',

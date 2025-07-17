@@ -1,0 +1,41 @@
+<template>
+  <div class="page">
+    <img src="../assets/logo.png" alt="" />
+    <h1>Registos</h1>
+  </div>
+</template>
+
+<script setup>
+import { onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { useRegisterSW } from 'virtual:pwa-register/vue'
+
+const router = useRouter()
+const ready = ref(false)
+
+useRegisterSW({
+  onOfflineReady() {
+    ready.value = true
+  },
+})
+
+onMounted(() => {
+  setTimeout(() => {
+    if (!ready.value) ready.value = true
+  }, 1000)
+})
+
+watch(ready, (val) => {
+  if (val) {
+    setTimeout(() => {
+      router.push('/home')
+    }, 800)
+  }
+})
+</script>
+
+<style scoped>
+img {
+  height: 11rem;
+}
+</style>

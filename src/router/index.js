@@ -5,6 +5,8 @@ import { ref } from 'vue'
 import HomeBase from '@/views/HomeBase.vue'
 import TheBedroom from '@/views/TheBedroom.vue'
 import ChangeSettings from '@/views/ChangeSettings.vue'
+import NotFound from '@/views/NotFound.vue'
+import OpenPage from '@/views/OpenPage.vue'
 
 const previousRoute = ref(null)
 
@@ -13,6 +15,11 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      name: 'open',
+      component: OpenPage,
+    },
+    {
+      path: '/home',
       name: 'home',
       component: HomeBase,
     },
@@ -35,6 +42,11 @@ const router = createRouter({
       path: '/settings',
       name: 'settings',
       component: ChangeSettings,
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: NotFound,
     },
   ],
 })

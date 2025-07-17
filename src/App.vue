@@ -1,12 +1,38 @@
+<template>
+  <router-view v-slot="{ Component }">
+    <transition name="fade-slide" mode="out-in">
+      <component :is="Component" @touchstart="onTouchStart" @touchend="onTouchEnd" />
+    </transition>
+    <transition name="fade-slide" mode="out-in">
+      <SpinnerCard v-if="spinner"></SpinnerCard>
+    </transition>
+    <transition name="fade-slide" mode="out-in">
+      <AlertCard
+        v-if="store.getters['alert/getAlert']"
+        :text="store.getters['alert/getText']"
+        :btn="store.getters['alert/getBtn']"
+        :choice="store.getters['alert/getChoice']"
+      ></AlertCard>
+    </transition>
+  </router-view>
+</template>
+
 <script setup>
 import { RouterView } from 'vue-router'
 import { useStore } from 'vuex'
 import { previousRoute, router } from './router'
-import { onBeforeUnmount, ref } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import AlertCard from './components/AlertCard.vue'
+import SpinnerCard from './components/SpinnerCard.vue'
+import { useRegisterSW } from 'virtual:pwa-register/vue'
 
 const store = useStore()
 
-document.addEventListener('contextmenu', (event) => event.preventDefault())
+const spinner = computed(() => {
+  return store.getters.getSpinner
+})
+
+/* document.addEventListener('contextmenu', (event) => event.preventDefault())
 
 // Disable F12, Ctrl+Shift+I
 document.addEventListener('keydown', (event) => {
@@ -55,7 +81,7 @@ function stopApp() {
 }
 
 // Call the detection function
-detectDevTools()
+detectDevTools() */
 
 store.dispatch('defenicoes/getSettings')
 
@@ -72,18 +98,20 @@ const onTouchStart = (e) => {
 
 const onTouchEnd = (e) => {
   touchEndX.value = e.changedTouches[0].screenX
-  if (touchStartX.value - touchEndX.value > 150 || touchEndX.value - touchStartX.value > 150) {
+  if (touchStartX.value - touchEndX.value > 150) {
     if (store.getters.getPage === 'piscina' || store.getters.getPage === 'quarto') {
       store.commit('setPage', 'table')
       router.push('/table')
-    } else if (store.getters.getPage === 'table') {
-      store.commit('setPage', 'table')
-      router.push(`${previousRoute.value?.path}`)
     } else if (store.getters.getPage === 'home') {
       store.commit('setPage', 'settings')
       router.push('/settings')
+    }
+  } else if (touchEndX.value - touchStartX.value > 150) {
+    if (store.getters.getPage === 'table') {
+      store.commit('setPage', 'table')
+      router.push(`${previousRoute.value?.path}`)
     } else if (store.getters.getPage === 'settings') {
-      router.push('/')
+      router.push('/home')
     }
   }
 }
@@ -93,15 +121,28 @@ function clearStorage() {
   localStorage.removeItem('logs1')
   localStorage.removeItem('logs2')
 }
-</script>
 
-<template>
-  <router-view v-slot="{ Component }">
-    <transition name="fade-slide" mode="out-in">
-      <component :is="Component" @touchstart="onTouchStart" @touchend="onTouchEnd" />
-    </transition>
-  </router-view>
-</template>
+const { needRefresh, updateServiceWorker } = useRegisterSW({})
+
+watch(needRefresh, (val) => {
+  if (val) {
+    store.commit('alert/setResponse', null)
+    store.commit('alert/setBtn', 'confirm')
+    store.commit('alert/setText', `Nova atualização disponível, pretende atualizar?`)
+    store.commit('alert/setAlert')
+  }
+})
+
+const response = computed(() => {
+  return store.getters['alert/getResponse']
+})
+
+watch(response, (novo) => {
+  if (novo) {
+    updateServiceWorker()
+  }
+})
+</script>
 
 <style>
 .fade-slide-enter-active {
