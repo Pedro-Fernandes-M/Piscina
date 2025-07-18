@@ -445,6 +445,6 @@ function abrirLink() {
   width: 100%;
   justify-content: right;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.2rem;
 }
 </style>
