@@ -128,6 +128,9 @@ const store = createStore({
       if (!storedToken) {
         commit('setGoogleCredential', null)
         localStorage.removeItem('token')
+        localStorage.removeItem('logs')
+        localStorage.removeItem('logs1')
+        localStorage.removeItem('logs2')
         commit('alert/setBtn', 'alert')
         commit('alert/setText', 'Login expirado! Efetue login manualmente no botão Refresh.')
         commit('alert/setAlert')
