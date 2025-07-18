@@ -120,7 +120,19 @@ const store = createStore({
         tokenClient.requestAccessToken()
       })
     },
+    async checkTokenValidity({ getters, commit }) {
+      const storedToken = localStorage.getItem('token')
 
+      if (getters.getGoogleCredential !== null) return true
+
+      if (!storedToken) {
+        commit('setGoogleCredential', null)
+        localStorage.removeItem('token')
+        commit('alert/setBtn', 'alert')
+        commit('alert/setText', 'Login expirado! Efetue login manualmente no botão Refresh.')
+        commit('alert/setAlert')
+      }
+    },
     async preencherSheet({ getters, dispatch, commit }, payload) {
       commit('setSpinner', !getters.getSpinner)
 

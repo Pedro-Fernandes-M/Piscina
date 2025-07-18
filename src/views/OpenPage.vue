@@ -22,7 +22,7 @@ useRegisterSW({
 onMounted(() => {
   setTimeout(() => {
     if (!ready.value) ready.value = true
-  }, 1000)
+  }, 900)
 })
 
 watch(ready, (val) => {

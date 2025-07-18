@@ -142,6 +142,14 @@ watch(response, (novo) => {
     updateServiceWorker()
   }
 })
+
+document.addEventListener('visibilitychange', () => {
+  setTimeout(() => {
+    if (document.visibilityState === 'visible') {
+      store.dispatch('checkTokenValidity')
+    }
+  }, 1000)
+})
 </script>
 
 <style>

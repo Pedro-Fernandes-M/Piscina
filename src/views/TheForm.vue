@@ -102,6 +102,10 @@ if (previousRoute.value?.path === '/table' && route.path === '/piscina' && store
   redirect.value = true
 }
 
+onMounted(() => {
+  store.commit('setPage', 'piscina')
+})
+
 const day = new Date().getDate()
 const monthNames = [
   'Janeiro',

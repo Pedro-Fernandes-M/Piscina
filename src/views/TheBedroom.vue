@@ -81,15 +81,16 @@
 <script setup>
 import IconBack from '@/components/icons/IconBack.vue'
 import { previousRoute, router } from '@/router'
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 
 const store = useStore()
 const route = useRoute()
 
-store.commit('setPage', 'quarto')
-
+onMounted(() => {
+  store.commit('setPage', 'quarto')
+})
 const day = new Date().getDate()
 const monthNames = [
   'Janeiro',

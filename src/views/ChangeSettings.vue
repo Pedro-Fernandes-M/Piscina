@@ -21,10 +21,14 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 
 const store = useStore()
+
+onMounted(() => {
+  store.commit('setPage', 'settings')
+})
 
 const settigns = [
   'API_Key',

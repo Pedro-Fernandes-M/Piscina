@@ -5,6 +5,9 @@
     </div>
     <div class="form">
       <div class="center">
+        <div class="link">
+          <IconLink @click="abrirLink"></IconLink>
+        </div>
         <h2 class="text" v-if="redirect">Espaços</h2>
         <h2 @click="mudarSheet" class="text" v-else>
           {{ piscina }}
@@ -93,13 +96,14 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
 import IconTrash from '@/components/icons/IconTrash.vue'
 import { previousRoute, router } from '@/router'
 import IconEdit from '@/components/icons/IconEdit.vue'
 import IconBack from '@/components/icons/IconBack.vue'
+import IconLink from '@/components/icons/IconLink.vue'
 
 const store = useStore()
 const route = useRoute()
@@ -137,20 +141,25 @@ const monthNames = [
 ]
 const month = monthNames[new Date().getMonth()]
 
-if (redirect.value) {
-  store.dispatch('lerPlanilha', {
-    dia: day,
-    mes: new Date().getMonth() + 1,
-    ano: new Date().getFullYear(),
-    options: 'quartos',
-  })
-} else {
-  store.dispatch('lerPlanilha', {
-    dia: day,
-    mes: month,
-    options: 'piscina',
-  })
+async function start() {
+  store.commit('setPage', 'table')
+  if (redirect.value) {
+    await store.dispatch('lerPlanilha', {
+      dia: day,
+      mes: new Date().getMonth() + 1,
+      ano: new Date().getFullYear(),
+      options: 'quartos',
+    })
+  } else {
+    await store.dispatch('lerPlanilha', {
+      dia: day,
+      mes: month,
+      options: 'piscina',
+    })
+  }
 }
+
+onMounted(start)
 
 const header = ref([
   'Ph',
@@ -306,6 +315,22 @@ watch(response, async (novo) => {
     store.commit('alert/setResponse', null)
   }
 })
+
+const link = computed(() => {
+  if (redirect.value) {
+    return store.getters['defenicoes/getEspacos'] || import.meta.env.VITE_SPREADSHEET_ID_2
+  } else if (piscina.value == 'Piscina Interior') {
+    return store.getters['defenicoes/getPiscInt'] || import.meta.env.VITE_SPREADSHEET_ID
+  } else if (piscina.value == 'Piscina Exterior') {
+    return store.getters['defenicoes/getPiscExt'] || import.meta.env.VITE_SPREADSHEET_ID_1
+  } else {
+    return null
+  }
+})
+
+function abrirLink() {
+  window.open(`https://docs.google.com/spreadsheets/d/${link.value}/edit`, '_blank')
+}
 </script>
 
 <style scoped>
@@ -413,5 +438,13 @@ watch(response, async (novo) => {
 
 .btn-color {
   background-color: rgb(39, 105, 197);
+}
+
+.link {
+  display: flex;
+  width: 100%;
+  justify-content: right;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 </style>
