@@ -98,7 +98,7 @@ const store = createStore({
             commit('setSpinner', false)
             return null
           }
-        }, 12000) // 30 segundos de timeout
+        }, 19000) // timeout
 
         const tokenClient = window.google.accounts.oauth2.initTokenClient({
           client_id: getters['defenicoes/getClient_ID'] || import.meta.env.VITE_CLIENT_ID,
@@ -313,7 +313,7 @@ const store = createStore({
         commit('setSpinner', !getters.getSpinner)
         return response
       } catch (error) {
-        console.error('Erro ao atualizar a planilha:', error)
+        console.error(`Erro ao atualizar a planilha:${error.message || error.toString()}`)
         commit('setSpinner', !getters.getSpinner)
         throw error
       }
@@ -323,7 +323,6 @@ const store = createStore({
 
       if (getters.getGoogleCredential === null) {
         const storedToken = localStorage.getItem('token')
-
         if (storedToken) {
           const parsedToken = JSON.parse(storedToken)
           const isValid = Date.now() - parsedToken.time < 3590 * 1000
@@ -337,12 +336,25 @@ const store = createStore({
               commit('setGoogleCredential', newToken)
               localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
             } else {
+              commit('alert/setBtn', 'alert')
+              commit(
+                'alert/setText',
+                'Sem login efetuado! \nEfetue login manualmente no botão Refresh.',
+              )
+              commit('alert/setAlert')
               commit('setSpinner', false)
               return
             }
           }
         } else {
-          if (payload.btn === true) {
+          let isValid = null
+          if (getters.getGoogleCredential) {
+            isValid = Date.now() - getters.getGoogleCredential < 3590 * 1000
+          }
+
+          if (payload.btn === true && isValid) {
+            commit('setGoogleCredential', getters.getGoogleCredential)
+          } else if (payload.btn === true && !isValid) {
             const newToken = await dispatch('solicitarToken')
             commit('setGoogleCredential', newToken)
             localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
@@ -465,7 +477,7 @@ const store = createStore({
         commit('setSpinner', !getters.getSpinner)
       } catch (error) {
         commit('alert/setBtn', 'alert')
-        commit('alert/setText', 'Erro ao ler dados do Sheets:' + error)
+        commit('alert/setText', `Erro ao ler dados do Sheets: ${error.message || error.toString()}`)
         commit('alert/setAlert')
         commit('setSpinner', !getters.getSpinner)
         return { status: 500, error }
@@ -556,12 +568,12 @@ const store = createStore({
           }
         } catch (error) {
           commit('alert/setBtn', 'alert')
-          commit('alert/setText', 'Erro ao apagar linha:' + error)
+          commit('alert/setText', `Erro ao apagar linha: ${error.message || error.toString()}`)
           commit('alert/setAlert')
         }
       } catch (error) {
         commit('alert/setBtn', 'alert')
-        commit('alert/setText', 'Erro ao apagar linha:' + error)
+        commit('alert/setText', `Erro ao apagar linha:${error.message || error.toString()}`)
         commit('alert/setAlert')
       }
     },

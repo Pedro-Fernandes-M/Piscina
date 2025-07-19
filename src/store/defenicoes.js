@@ -45,6 +45,7 @@ const defenicoes = {
       commit('setAssinatura', '')
       commit('setEspacos', '')
       localStorage.removeItem('def')
+      console.log('reset')
     },
     setSettings({ commit }, payload) {
       commit('setAPI_Key', payload.API_Key || null)
@@ -63,6 +64,18 @@ const defenicoes = {
     getSettings({ dispatch }) {
       let settings = JSON.parse(localStorage.getItem('def')) || {}
       dispatch('setSettings', settings)
+    },
+    cache({ commit }) {
+      commit('setGoogleCredential', null, { root: true })
+      localStorage.removeItem('token')
+      if ('caches' in window) {
+        caches.keys().then((names) => {
+          for (let name of names) {
+            caches.delete(name)
+          }
+        })
+      }
+      return true
     },
   },
 }

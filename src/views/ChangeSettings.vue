@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2>Definições</h2>
+    <h2 @dblclick="visível = !visível">Definições</h2>
     <div class="grid">
       <div v-for="(item, id) in settigns" :key="id" class="grid1">
         <label>{{ item }}</label>
@@ -16,12 +16,15 @@
           Apagar
         </button>
       </div>
+      <div class="width">
+        <button @click="apagar_cache" class="button-1" v-if="visível">Apagar Cache</button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeMount, onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 
 const store = useStore()
@@ -85,18 +88,50 @@ const guardar = () => {
   }
 }
 
+const visível = ref()
+const reset = ref()
+const cache = ref()
+
 const apagar = async () => {
+  reset.value = true
   store.commit('alert/setResponse', null)
   store.commit('alert/setBtn', 'confirm')
   store.commit('alert/setText', `Pretende apagar as definições?`)
   store.commit('alert/setAlert')
 }
 
+const apagar_cache = async () => {
+  cache.value = true
+  store.commit('alert/setResponse', null)
+  store.commit('alert/setBtn', 'confirm')
+  store.commit(
+    'alert/setText',
+    'Pretende apagar cache e todas as variáveis armazenadas?\n(Apenas recomendado em caso de erros persistentes!)',
+  )
+  store.commit('alert/setAlert')
+}
+
 watch(response, async (novo) => {
-  if (novo) {
+  if (novo && reset.value) {
     await store.dispatch('defenicoes/reset')
+    reset.value = false
+  } else if (novo && cache.value) {
+    const done = await store.dispatch('defenicoes/cache')
+    if (done) {
+      store.commit('alert/setBtn', 'alert')
+      store.commit('alert/setText', `Cache e dados apagados com sucesso!`)
+      store.commit('alert/setAlert')
+    }
+    cache.value = false
+    visível.value = false
   }
 })
+
+const change_visivel = () => {
+  visível.value = false
+}
+
+onBeforeMount(change_visivel)
 </script>
 
 <style scoped>
@@ -162,5 +197,12 @@ h2 {
 .no-gap {
   display: flex;
   justify-content: center;
+}
+
+.width {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 2rem;
 }
 </style>

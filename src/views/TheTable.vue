@@ -141,7 +141,7 @@ const monthNames = [
 ]
 const month = monthNames[new Date().getMonth()]
 
-async function start() {
+const start = async () => {
   store.commit('setPage', 'table')
   if (redirect.value) {
     await store.dispatch('lerPlanilha', {
