@@ -187,6 +187,7 @@ h2 {
   color: aliceblue;
   font-weight: 1000;
   margin-bottom: 0.8rem;
+  margin-top: 0.5rem;
 }
 
 .gap {
