@@ -6,7 +6,10 @@
     <div class="form">
       <div class="center">
         <div class="link">
-          <IconLink @click="abrirLink"></IconLink>
+          <IconLink
+            @click="abrirLink"
+            v-if="Date.now() - store.getters.getGoogleCredential < 3590 * 1000"
+          ></IconLink>
         </div>
         <h2 class="text" v-if="redirect">Espaços</h2>
         <h2 @click="mudarSheet" class="text" v-else>
