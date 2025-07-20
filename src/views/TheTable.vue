@@ -6,10 +6,7 @@
     <div class="form">
       <div class="center">
         <div class="link">
-          <IconLink
-            @click="abrirLink"
-            v-if="Date.now() - store.getters.getGoogleCredential < 3590 * 1000"
-          ></IconLink>
+          <IconLink @click="abrirLink" v-if="link_v"></IconLink>
         </div>
         <h2 class="text" v-if="redirect">Espaços</h2>
         <h2 @click="mudarSheet" class="text" v-else>
@@ -124,6 +121,13 @@ const assinatura = computed(() => {
   return store.getters['defenicoes/getAssinatura'] || 'Filipe Fernandes'
 })
 
+const link_v = ref()
+function valid_link() {
+  const storedToken = localStorage.getItem('token')
+  const parsedToken = JSON.parse(storedToken)
+  const isValid = Date.now() - parsedToken.time < 3590 * 1000
+  link_v.value = isValid
+}
 const index = ref()
 const edit = ref()
 
@@ -160,9 +164,10 @@ const start = async () => {
       options: 'piscina',
     })
   }
+  valid_link()
 }
 
-onMounted(start)
+onMounted(start, valid_link())
 
 const header = ref([
   'Ph',
@@ -221,6 +226,7 @@ async function lerDados() {
     }
     await store.dispatch('lerPlanilha', input)
   }
+  valid_link()
 }
 
 function mudarSheet() {
@@ -245,6 +251,7 @@ function mudarSheet() {
       })
     }
   }
+  valid_link()
 }
 let del = false
 
