@@ -134,7 +134,7 @@ const change_visivel = () => {
 
 onBeforeMount(change_visivel)
 
-const version = '0.0.' + __APP_VERSION__
+const version = __APP_VERSION__
 </script>
 
 <style scoped>
