@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <h2 @dblclick="visível = !visível">Definições</h2>
-    <h3 v-if="visível">%appVersion%</h3>
+    <h3 v-if="visível">{{ version }}</h3>
     <div class="grid">
       <div v-for="(item, id) in settigns" :key="id" class="grid1">
         <label>{{ item }}</label>
@@ -133,6 +133,8 @@ const change_visivel = () => {
 }
 
 onBeforeMount(change_visivel)
+
+const version = '0.0.' + __APP_VERSION__
 </script>
 
 <style scoped>

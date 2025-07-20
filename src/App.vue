@@ -31,7 +31,7 @@ const store = useStore()
 const spinner = computed(() => {
   return store.getters.getSpinner
 })
-
+/* 
 document.addEventListener('contextmenu', (event) => event.preventDefault())
 
 // Disable F12, Ctrl+Shift+I
@@ -81,7 +81,7 @@ function stopApp() {
 }
 
 // Call the detection function
-detectDevTools()
+detectDevTools() */
 
 store.dispatch('defenicoes/getSettings')
 

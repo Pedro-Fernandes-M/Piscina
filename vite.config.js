@@ -5,12 +5,9 @@ import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import fs from 'fs'
 import { VitePWA } from 'vite-plugin-pwa'
-import { createHtmlPlugin } from 'vite-plugin-html'
 
 export default defineConfig(({ mode }) => {
-  // carrega as variáveis do .env baseado no modo (dev/prod)
   const env = loadEnv(mode, process.cwd(), '')
-
   return {
     plugins: [
       vue(),
@@ -53,14 +50,10 @@ export default defineConfig(({ mode }) => {
           ],
         },
       }),
-      createHtmlPlugin({
-        inject: {
-          data: {
-            appVersion: env.VITE_APP_VERSION || 'dev',
-          },
-        },
-      }),
     ],
+    define: {
+      __APP_VERSION__: JSON.stringify(env.VITE_APP_VERSION || 'dev'),
+    },
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
