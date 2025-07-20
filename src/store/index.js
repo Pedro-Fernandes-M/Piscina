@@ -347,10 +347,8 @@ const store = createStore({
             }
           }
         } else {
-          let isValid = null
-          if (getters.getGoogleCredential) {
-            isValid = Date.now() - getters.getGoogleCredential < 3590 * 1000
-          }
+          const parsedToken = JSON.parse(storedToken)
+          const isValid = Date.now() - parsedToken.time < 3590 * 1000
 
           if (payload.btn === true && isValid) {
             commit('setGoogleCredential', getters.getGoogleCredential)
@@ -476,8 +474,18 @@ const store = createStore({
         }
         commit('setSpinner', !getters.getSpinner)
       } catch (error) {
+        let mensagemErro = 'Erro ao ler dados do Sheets.'
+
+        if (error.response?.data?.error?.message) {
+          mensagemErro += ` ${error.response.data.error.message}`
+        } else if (error.message) {
+          mensagemErro += ` ${error.message}`
+        } else {
+          mensagemErro += ` ${JSON.stringify(error)}`
+        }
+
         commit('alert/setBtn', 'alert')
-        commit('alert/setText', `Erro ao ler dados do Sheets: ${error.message || error.toString()}`)
+        commit('alert/setText', `Erro ao ler dados do Sheets: ${mensagemErro}`)
         commit('alert/setAlert')
         commit('setSpinner', !getters.getSpinner)
         return { status: 500, error }
