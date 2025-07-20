@@ -125,8 +125,11 @@ const link_v = ref()
 function valid_link() {
   const storedToken = localStorage.getItem('token')
   const parsedToken = JSON.parse(storedToken)
-  const isValid = Date.now() - parsedToken.time < 3590 * 1000
-  link_v.value = isValid
+  const isValid = ref()
+  if (parsedToken) {
+    isValid.value = Date.now() - parsedToken.time < 3590 * 1000
+  }
+  link_v.value = isValid.value || false
 }
 const index = ref()
 const edit = ref()
@@ -303,7 +306,13 @@ const response = computed(() => store.getters['alert/getResponse'])
 watch(response, async (novo) => {
   if (novo && edit.value) {
     store.commit('setChange', data.value[index.value])
-    await store.dispatch('deleteLog', { mes: month, index: index.value, dia: day, del: false })
+    await store.dispatch('deleteLog', {
+      mes: month,
+      index: index.value,
+      dia: day,
+      del: false,
+      btn: true,
+    })
     store.commit('alert/setResponse', null)
     edit.value = false
     router.push('/piscina')
@@ -313,15 +322,16 @@ watch(response, async (novo) => {
       ano: new Date().getFullYear(),
       index: index.value,
       dia: day,
-      del: false,
+      del: del,
       options: 'quartos',
+      btn: true,
     })
     if (del == false) {
       router.push('/quartos')
     }
     store.commit('alert/setResponse', null)
   } else if (novo) {
-    store.dispatch('deleteLog', { mes: month, index: index.value, dia: day, del: true })
+    store.dispatch('deleteLog', { mes: month, index: index.value, dia: day, del: true, btn: true })
     store.commit('alert/setResponse', null)
   }
 })

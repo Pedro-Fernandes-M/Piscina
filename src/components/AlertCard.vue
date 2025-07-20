@@ -1,7 +1,9 @@
 <template>
   <div class="wrapper" @click="store.commit('alert/setAlert')">
     <div class="card" @click.stop>
-      <span>{{ props.text }}</span>
+      <div class="width">
+        <span class="text">{{ props.text }}</span>
+      </div>
       <div v-if="props.btn === 'alert'">
         <button @click="store.commit('alert/setAlert')">OK</button>
       </div>
@@ -41,6 +43,8 @@ function input(input) {
 <style scoped>
 .card {
   display: grid;
+  justify-content: center;
+  align-items: center;
   text-align: center;
   background-color: rgb(64, 66, 67);
   padding: 0.85rem;
@@ -92,5 +96,11 @@ button {
 }
 .fail {
   background-color: rgba(168, 4, 4, 0.764);
+}
+
+.width {
+  max-height: 75%;
+  overflow-y: auto;
+  margin-bottom: 0.25rem;
 }
 </style>

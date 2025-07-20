@@ -29,3 +29,6 @@ coverage
 *.env
 
 *.tsbuildinfo
+
+.env.version
+

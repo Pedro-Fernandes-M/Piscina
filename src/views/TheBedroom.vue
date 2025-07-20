@@ -233,11 +233,11 @@ async function preencher() {
     comentarios: comentarios.value,
     options: 'quartos',
     ano: new Date().getFullYear(),
+    btn: true,
   }
 
   try {
     const response = await store.dispatch('preencherSheet', payload)
-
     if (response.status === 200) {
       quarto.value = null
       temp_quente.value = null

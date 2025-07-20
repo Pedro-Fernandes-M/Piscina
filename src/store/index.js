@@ -139,24 +139,61 @@ const store = createStore({
     async preencherSheet({ getters, dispatch, commit }, payload) {
       commit('setSpinner', !getters.getSpinner)
 
-      if (getters.getGoogleCredential === null) {
-        const storedToken = localStorage.getItem('token')
+      let credential = getters.getGoogleCredential
+      const rawToken = localStorage.getItem('token')
+      let parsedToken = null
 
-        if (storedToken) {
-          const parsedToken = JSON.parse(storedToken)
-          const isValid = Date.now() - parsedToken.time < 3590 * 1000
+      if (!credential) {
+        if (rawToken) {
+          try {
+            parsedToken = JSON.parse(rawToken)
+          } catch (error) {
+            let mensagemErro = 'Token inválido no localStorage'
 
-          if (isValid) {
-            commit('setGoogleCredential', parsedToken.access)
-          } else {
-            const newToken = await dispatch('solicitarToken')
-            commit('setGoogleCredential', newToken)
-            localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+            if (error.response?.data?.error?.message) {
+              mensagemErro += ` ${error.response.data.error.message}`
+            } else if (error.message) {
+              mensagemErro += ` ${error.message}`
+            } else {
+              mensagemErro += ` ${JSON.stringify(error)}`
+            }
+
+            commit('alert/setBtn', 'alert')
+            commit('alert/setText', `Erro ao ler dados do Sheets: ${mensagemErro}`)
+            commit('alert/setAlert')
           }
-        } else {
+        }
+
+        const isValid =
+          parsedToken && parsedToken.time && Date.now() - parsedToken.time < 3590 * 1000
+
+        if (isValid) {
+          credential = parsedToken.access
+          commit('setGoogleCredential', credential)
+        } else if (payload.btn === true) {
           const newToken = await dispatch('solicitarToken')
           commit('setGoogleCredential', newToken)
           localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+          credential = newToken
+        } else {
+          commit('alert/setBtn', 'alert')
+          commit(
+            'alert/setText',
+            'Sem login efetuado! \nEfetue login manualmente no botão Refresh.',
+          )
+          commit('alert/setAlert')
+          commit('setSpinner', false)
+          return
+        }
+      } else if (rawToken) {
+        parsedToken = JSON.parse(rawToken)
+        const isValid =
+          parsedToken && parsedToken.time && Date.now() - parsedToken.time < 3590 * 1000
+        if (!isValid) {
+          const newToken = await dispatch('solicitarToken')
+          commit('setGoogleCredential', newToken)
+          localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+          credential = newToken
         }
       }
 
@@ -176,7 +213,7 @@ const store = createStore({
         discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
       })
 
-      gapi.client.setToken({ access_token: getters.getGoogleCredential })
+      gapi.client.setToken({ access_token: credential })
 
       try {
         let range = null
@@ -313,7 +350,19 @@ const store = createStore({
         commit('setSpinner', !getters.getSpinner)
         return response
       } catch (error) {
-        console.error(`Erro ao atualizar a planilha:${error.message || error.toString()}`)
+        let mensagemErro = 'Erro ao preencher sheet.'
+
+        if (error.response?.data?.error?.message) {
+          mensagemErro += ` ${error.response.data.error.message}`
+        } else if (error.message) {
+          mensagemErro += ` ${error.message}`
+        } else {
+          mensagemErro += ` ${JSON.stringify(error)}`
+        }
+
+        commit('alert/setBtn', 'alert')
+        commit('alert/setText', `${mensagemErro}`)
+        commit('alert/setAlert')
         commit('setSpinner', !getters.getSpinner)
         throw error
       }
@@ -321,51 +370,62 @@ const store = createStore({
     async lerPlanilha({ getters, commit, dispatch }, payload) {
       commit('setSpinner', true)
 
-      if (getters.getGoogleCredential === null) {
-        const storedToken = localStorage.getItem('token')
-        if (storedToken) {
-          const parsedToken = JSON.parse(storedToken)
-          const isValid = Date.now() - parsedToken.time < 3590 * 1000
+      let credential = getters.getGoogleCredential
+      const rawToken = localStorage.getItem('token')
+      let parsedToken = null
 
-          if (isValid) {
-            commit('setGoogleCredential', parsedToken.access)
-          } else {
-            if (payload.btn === true) {
-              const newToken = await dispatch('solicitarToken')
+      if (!credential) {
+        if (rawToken) {
+          try {
+            parsedToken = JSON.parse(rawToken)
+          } catch (error) {
+            let mensagemErro = 'Token inválido no localStorage.'
 
-              commit('setGoogleCredential', newToken)
-              localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+            if (error.response?.data?.error?.message) {
+              mensagemErro += ` ${error.response.data.error.message}`
+            } else if (error.message) {
+              mensagemErro += ` ${error.message}`
             } else {
-              commit('alert/setBtn', 'alert')
-              commit(
-                'alert/setText',
-                'Sem login efetuado! \nEfetue login manualmente no botão Refresh.',
-              )
-              commit('alert/setAlert')
-              commit('setSpinner', false)
-              return
+              mensagemErro += ` ${JSON.stringify(error)}`
             }
-          }
-        } else {
-          const parsedToken = JSON.parse(storedToken)
-          const isValid = Date.now() - parsedToken.time < 3590 * 1000
 
-          if (payload.btn === true && isValid) {
-            commit('setGoogleCredential', getters.getGoogleCredential)
-          } else if (payload.btn === true && !isValid) {
-            const newToken = await dispatch('solicitarToken')
-            commit('setGoogleCredential', newToken)
-            localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
-          } else {
             commit('alert/setBtn', 'alert')
-            commit(
-              'alert/setText',
-              'Sem login efetuado! \nEfetue login manualmente no botão Refresh.',
-            )
+            commit('alert/setText', `${mensagemErro}`)
             commit('alert/setAlert')
-            commit('setSpinner', false)
-            return
+            commit('setSpinner', !getters.getSpinner)
           }
+        }
+
+        const isValid =
+          parsedToken && parsedToken.time && Date.now() - parsedToken.time < 3590 * 1000
+
+        if (isValid) {
+          credential = parsedToken.access
+          commit('setGoogleCredential', credential)
+        } else if (payload.btn === true) {
+          const newToken = await dispatch('solicitarToken')
+          commit('setGoogleCredential', newToken)
+          localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+          credential = newToken
+        } else {
+          commit('alert/setBtn', 'alert')
+          commit(
+            'alert/setText',
+            'Sem login efetuado! \nEfetue login manualmente no botão Refresh.',
+          )
+          commit('alert/setAlert')
+          commit('setSpinner', false)
+          return
+        }
+      } else if (rawToken) {
+        parsedToken = JSON.parse(rawToken)
+        const isValid =
+          parsedToken && parsedToken.time && Date.now() - parsedToken.time < 3590 * 1000
+        if (!isValid) {
+          const newToken = await dispatch('solicitarToken')
+          commit('setGoogleCredential', newToken)
+          localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+          credential = newToken
         }
       }
 
@@ -382,7 +442,7 @@ const store = createStore({
         discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
       })
 
-      gapi.client.setToken({ access_token: getters.getGoogleCredential })
+      gapi.client.setToken({ access_token: credential })
 
       let range = null
       let spreadsheetId1 = null
@@ -485,7 +545,7 @@ const store = createStore({
         }
 
         commit('alert/setBtn', 'alert')
-        commit('alert/setText', `Erro ao ler dados do Sheets: ${mensagemErro}`)
+        commit('alert/setText', `${mensagemErro}`)
         commit('alert/setAlert')
         commit('setSpinner', !getters.getSpinner)
         return { status: 500, error }
@@ -494,26 +554,61 @@ const store = createStore({
     async deleteLog({ getters, commit, dispatch }, payload) {
       commit('setSpinner', !getters.getSpinner)
 
-      if (getters.getGoogleCredential === null) {
-        const storedToken = localStorage.getItem('token')
+      let credential = getters.getGoogleCredential
+      const rawToken = localStorage.getItem('token')
+      let parsedToken = null
 
-        if (storedToken) {
-          const parsedToken = JSON.parse(storedToken)
-          const isValid = Date.now() - parsedToken.time < 3590 * 1000
+      if (!credential) {
+        if (rawToken) {
+          try {
+            parsedToken = JSON.parse(rawToken)
+          } catch (error) {
+            let mensagemErro = 'Token inválido no localStorage.'
 
-          if (isValid) {
-            commit('setGoogleCredential', parsedToken.access)
-          } else {
-            const newToken = await dispatch('solicitarToken')
+            if (error.response?.data?.error?.message) {
+              mensagemErro += ` ${error.response.data.error.message}`
+            } else if (error.message) {
+              mensagemErro += ` ${error.message}`
+            } else {
+              mensagemErro += ` ${JSON.stringify(error)}`
+            }
 
-            commit('setGoogleCredential', newToken)
-            localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+            commit('alert/setBtn', 'alert')
+            commit('alert/setText', `${mensagemErro}`)
+            commit('alert/setAlert')
           }
-        } else {
-          const newToken = await dispatch('solicitarToken')
+        }
 
+        const isValid =
+          parsedToken && parsedToken.time && Date.now() - parsedToken.time < 3590 * 1000
+
+        if (isValid) {
+          credential = parsedToken.access
+          commit('setGoogleCredential', credential)
+        } else if (payload.btn === true) {
+          const newToken = await dispatch('solicitarToken')
           commit('setGoogleCredential', newToken)
           localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+          credential = newToken
+        } else {
+          commit('alert/setBtn', 'alert')
+          commit(
+            'alert/setText',
+            'Sem login efetuado! \nEfetue login manualmente no botão Refresh.',
+          )
+          commit('alert/setAlert')
+          commit('setSpinner', false)
+          return
+        }
+      } else if (rawToken) {
+        parsedToken = JSON.parse(rawToken)
+        const isValid =
+          parsedToken && parsedToken.time && Date.now() - parsedToken.time < 3590 * 1000
+        if (!isValid) {
+          const newToken = await dispatch('solicitarToken')
+          commit('setGoogleCredential', newToken)
+          localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
+          credential = newToken
         }
       }
 
@@ -575,13 +670,33 @@ const store = createStore({
             })
           }
         } catch (error) {
+          let mensagemErro = 'Erro ao ler dados do Sheets.'
+
+          if (error.response?.data?.error?.message) {
+            mensagemErro += ` ${error.response.data.error.message}`
+          } else if (error.message) {
+            mensagemErro += ` ${error.message}`
+          } else {
+            mensagemErro += ` ${JSON.stringify(error)}`
+          }
+
           commit('alert/setBtn', 'alert')
-          commit('alert/setText', `Erro ao apagar linha: ${error.message || error.toString()}`)
+          commit('alert/setText', `Erro ao ler dados do Sheets: ${mensagemErro}`)
           commit('alert/setAlert')
         }
       } catch (error) {
+        let mensagemErro = 'Erro ao ler dados do Sheets.'
+
+        if (error.response?.data?.error?.message) {
+          mensagemErro += ` ${error.response.data.error.message}`
+        } else if (error.message) {
+          mensagemErro += ` ${error.message}`
+        } else {
+          mensagemErro += ` ${JSON.stringify(error)}`
+        }
+
         commit('alert/setBtn', 'alert')
-        commit('alert/setText', `Erro ao apagar linha:${error.message || error.toString()}`)
+        commit('alert/setText', `Erro ao ler dados do Sheets: ${mensagemErro}`)
         commit('alert/setAlert')
       }
     },
