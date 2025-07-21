@@ -202,6 +202,7 @@ const store = createStore({
           )
           commit('alert/setAlert')
           commit('setSpinner', false)
+          return
         }
       }
 
@@ -439,6 +440,7 @@ const store = createStore({
           commit('alert/setText', 'Sem login efetuado! \nEfetue login manualmente no botão.')
           commit('alert/setAlert')
           commit('setSpinner', false)
+          return
         }
       }
 
@@ -627,6 +629,7 @@ const store = createStore({
           commit('alert/setText', 'Sem login efetuado! \nEfetue login manualmente no botão.')
           commit('alert/setAlert')
           commit('setSpinner', false)
+          return
         }
       }
 
