@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import { previousRoute, router } from './router'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
@@ -83,6 +83,8 @@ function stopApp() {
 // Call the detection function
 detectDevTools()
 
+const update = ref(false)
+
 store.dispatch('defenicoes/getSettings')
 
 onBeforeUnmount(() => {
@@ -127,6 +129,7 @@ const { needRefresh, updateServiceWorker } = useRegisterSW({})
 watch(needRefresh, (val) => {
   alert('needRefresh')
   if (val) {
+    update.value = true
     store.commit('alert/setResponse', null)
     store.commit('alert/setBtn', 'confirm')
     store.commit('alert/setText', `Nova atualização disponível, pretende atualizar?`)
@@ -140,8 +143,9 @@ const response = computed(() => {
 
 watch(response, (novo) => {
   alert('update')
-  if (novo) {
+  if (novo && update.value) {
     updateServiceWorker()
+    update.value = false
   }
 })
 
