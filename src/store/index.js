@@ -189,11 +189,19 @@ const store = createStore({
         parsedToken = JSON.parse(rawToken)
         const isValid =
           parsedToken && parsedToken.time && Date.now() - parsedToken.time < 3590 * 1000
-        if (!isValid) {
+        if (!isValid && payload.btn) {
           const newToken = await dispatch('solicitarToken')
           commit('setGoogleCredential', newToken)
           localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
           credential = newToken
+        } else if (!isValid && !payload.btn) {
+          commit('alert/setBtn', 'alert')
+          commit(
+            'alert/setText',
+            'Sem login efetuado! \nEfetue login manualmente no botão Refresh.',
+          )
+          commit('alert/setAlert')
+          commit('setSpinner', false)
         }
       }
 
@@ -421,11 +429,16 @@ const store = createStore({
         parsedToken = JSON.parse(rawToken)
         const isValid =
           parsedToken && parsedToken.time && Date.now() - parsedToken.time < 3590 * 1000
-        if (!isValid) {
+        if (!isValid && payload.btn) {
           const newToken = await dispatch('solicitarToken')
           commit('setGoogleCredential', newToken)
           localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
           credential = newToken
+        } else if (!isValid && !payload.btn) {
+          commit('alert/setBtn', 'alert')
+          commit('alert/setText', 'Sem login efetuado! \nEfetue login manualmente no botão.')
+          commit('alert/setAlert')
+          commit('setSpinner', false)
         }
       }
 
@@ -604,11 +617,16 @@ const store = createStore({
         parsedToken = JSON.parse(rawToken)
         const isValid =
           parsedToken && parsedToken.time && Date.now() - parsedToken.time < 3590 * 1000
-        if (!isValid) {
+        if (!isValid && payload.btn) {
           const newToken = await dispatch('solicitarToken')
           commit('setGoogleCredential', newToken)
           localStorage.setItem('token', JSON.stringify({ time: Date.now(), access: newToken }))
           credential = newToken
+        } else if (!isValid && !payload.btn) {
+          commit('alert/setBtn', 'alert')
+          commit('alert/setText', 'Sem login efetuado! \nEfetue login manualmente no botão.')
+          commit('alert/setAlert')
+          commit('setSpinner', false)
         }
       }
 

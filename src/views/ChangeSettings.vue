@@ -1,7 +1,10 @@
 <template>
   <div class="page">
-    <h2 @dblclick="visível = !visível">Definições</h2>
-    <h3 v-if="visível">{{ version }}</h3>
+    <h2 @dblclick="visível = !visível">
+      Definições
+      <h5 v-if="visível">{{ version }}</h5>
+    </h2>
+
     <div class="grid">
       <div v-for="(item, id) in settigns" :key="id" class="grid1">
         <label>{{ item }}</label>
@@ -208,5 +211,8 @@ h2 {
   justify-content: center;
   width: 100%;
   margin-bottom: 2rem;
+}
+h5 {
+  text-align: center;
 }
 </style>
