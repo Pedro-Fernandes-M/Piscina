@@ -125,6 +125,7 @@ function clearStorage() {
 const { needRefresh, updateServiceWorker } = useRegisterSW({})
 
 watch(needRefresh, (val) => {
+  alert('needRefresh')
   if (val) {
     store.commit('alert/setResponse', null)
     store.commit('alert/setBtn', 'confirm')
@@ -138,6 +139,7 @@ const response = computed(() => {
 })
 
 watch(response, (novo) => {
+  alert('update')
   if (novo) {
     updateServiceWorker()
   }

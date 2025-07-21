@@ -14,6 +14,7 @@ export default defineConfig(({ mode }) => {
       vueDevTools(),
       VitePWA({
         registerType: 'autoUpdate',
+        injectRegister: 'auto',
         globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
         includeAssets: ['logo.png'],
         devOptions: {
