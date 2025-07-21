@@ -142,8 +142,8 @@ const response = computed(() => {
 })
 
 watch(response, (novo) => {
-  alert('update')
   if (novo && update.value) {
+    alert('update')
     updateServiceWorker()
     update.value = false
   }
