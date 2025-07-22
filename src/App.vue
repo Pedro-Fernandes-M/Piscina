@@ -116,6 +116,8 @@ const onTouchEnd = (e) => {
       router.push(`${previousRoute.value?.path}`)
     } else if (store.getters.getPage === 'settings') {
       router.push('/home')
+    } else if (store.getters.getPage === 'secret') {
+      router.push('/settings')
     }
   }
 }

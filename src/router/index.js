@@ -7,6 +7,7 @@ import TheBedroom from '@/views/TheBedroom.vue'
 import ChangeSettings from '@/views/ChangeSettings.vue'
 import NotFound from '@/views/NotFound.vue'
 import OpenPage from '@/views/OpenPage.vue'
+import VersionControl from '@/views/VersionControl.vue'
 
 const previousRoute = ref(null)
 
@@ -42,6 +43,11 @@ const router = createRouter({
       path: '/settings',
       name: 'settings',
       component: ChangeSettings,
+    },
+    {
+      path: '/secret',
+      name: 'secret',
+      component: VersionControl,
     },
     {
       path: '/:pathMatch(.*)*',

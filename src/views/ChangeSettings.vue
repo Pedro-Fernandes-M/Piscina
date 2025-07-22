@@ -1,9 +1,6 @@
 <template>
   <div class="page">
-    <h2 @dblclick="visível = !visível">
-      Definições
-      <h5 v-if="visível">{{ version }}</h5>
-    </h2>
+    <h2 @dblclick="router.push('/secret')">Definições</h2>
     <div class="grid">
       <div v-for="(item, id) in settigns" :key="id" class="grid1">
         <label>{{ item }}</label>
@@ -15,24 +12,31 @@
         <input type="file" accept=".json" id="file" @change="handleFile" style="display: none" />
       </div>
       <button class="button-2" @click="upload">
-        <span v-if="mapa != null"> Reupload Mapa </span>
-        <span v-else> Upload Mapa </span>
+        <span v-if="mapa != null" class="span"><IconReUpload /> Reupload Mapa </span>
+        <span v-else><IconUpload /> Upload Mapa </span>
       </button>
+
       <div :class="change.some((item) => item !== null) ? 'gap' : 'no-gap'">
-        <button @click="guardar">Guardar</button>
-        <button @click="apagar" class="button-1" v-if="change.some((item) => item !== null)">
-          Apagar
-        </button>
-      </div>
-      <div class="width">
-        <button @click="apagar_cache" class="button-1" v-if="visível">Apagar Cache</button>
+        <button @click="guardar" class="button-3">Guardar</button>
+        <transition>
+          <button
+            @click="apagar"
+            class="button-1 button-3"
+            v-if="change.some((item) => item !== null)"
+          >
+            Apagar
+          </button>
+        </transition>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, onBeforeMount, onMounted, ref, watch } from 'vue'
+import IconReUpload from '@/components/icons/IconReUpload.vue'
+import IconUpload from '@/components/icons/IconUpload.vue'
+import { router } from '@/router'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 
 const store = useStore()
@@ -101,9 +105,7 @@ const guardar = () => {
   }
 }
 
-const visível = ref()
 const reset = ref()
-const cache = ref()
 
 const apagar = async () => {
   reset.value = true
@@ -113,40 +115,12 @@ const apagar = async () => {
   store.commit('alert/setAlert')
 }
 
-const apagar_cache = async () => {
-  cache.value = true
-  store.commit('alert/setResponse', null)
-  store.commit('alert/setBtn', 'confirm')
-  store.commit(
-    'alert/setText',
-    'Pretende apagar cache e todas as variáveis armazenadas?\n(Apenas recomendado em caso de erros persistentes!)',
-  )
-  store.commit('alert/setAlert')
-}
-
 watch(response, async (novo) => {
   if (novo && reset.value) {
     await store.dispatch('defenicoes/reset')
     reset.value = false
-  } else if (novo && cache.value) {
-    const done = await store.dispatch('defenicoes/cache')
-    if (done) {
-      store.commit('alert/setBtn', 'alert')
-      store.commit('alert/setText', `Cache e dados apagados com sucesso!`)
-      store.commit('alert/setAlert')
-    }
-    cache.value = false
-    visível.value = false
   }
 })
-
-const change_visivel = () => {
-  visível.value = false
-}
-
-onBeforeMount(change_visivel)
-
-const version = __APP_VERSION__
 
 function upload() {
   document.getElementById('file').click()
@@ -193,15 +167,21 @@ input {
   border-radius: 8px;
   outline: none;
   font-size: 16px;
-  background-color: #444;
+  background-color: #333;
   color: #fff;
-  width: 200px;
-  transition: box-shadow 0.2s ease;
   width: 100%;
+  transition: box-shadow 0.2s ease;
+
+  box-shadow:
+    inset 2px 2px 5px rgba(0, 0, 0, 0.6),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.05);
 }
 
 input:focus {
-  box-shadow: 0 0 0 2px #00bcd4;
+  box-shadow:
+    inset 1px 1px 2px rgba(0, 0, 0, 0.8),
+    inset -1px -1px 2px rgba(255, 255, 255, 0.1),
+    0 0 5px rgba(100, 200, 255, 0.4);
 }
 
 button {
@@ -215,12 +195,22 @@ button {
   cursor: pointer;
 }
 
-.button-1 {
-  background-color: #d40700;
-}
 .button-2 {
-  background-color: #b4af27;
-  margin-bottom: 1rem;
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.1s ease;
+
+  box-shadow:
+    inset 2px 2px 5px rgba(0, 0, 0, 0.6),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.05);
 }
 
 .input-erro {
@@ -233,16 +223,21 @@ h2 {
   margin-bottom: 0.8rem;
   margin-top: 0.5rem;
 }
+.button-1 {
+  background-color: #d40700;
+}
 
 .gap {
   display: flex;
   justify-content: space-between;
-  align-items: center; /* optional: vertical alignment */
-  gap: 1rem; /* still applies if there are more elements */
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 .no-gap {
   display: flex;
   justify-content: center;
+  margin-bottom: 2rem;
 }
 
 .width {
@@ -251,7 +246,11 @@ h2 {
   width: 100%;
   margin-bottom: 2rem;
 }
-h5 {
+.span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   text-align: center;
+  gap: 0.3rem;
 }
 </style>
