@@ -4,7 +4,6 @@
       Definições
       <h5 v-if="visível">{{ version }}</h5>
     </h2>
-
     <div class="grid">
       <div v-for="(item, id) in settigns" :key="id" class="grid1">
         <label>{{ item }}</label>
@@ -13,7 +12,12 @@
           v-model.trim="change[id]"
           :class="[change[id] == '' ? 'input-erro' : '']"
         />
+        <input type="file" accept=".json" id="file" @change="handleFile" style="display: none" />
       </div>
+      <button class="button-2" @click="upload">
+        <span v-if="mapa != null"> Reupload Mapa </span>
+        <span v-else> Upload Mapa </span>
+      </button>
       <div :class="change.some((item) => item !== null) ? 'gap' : 'no-gap'">
         <button @click="guardar">Guardar</button>
         <button @click="apagar" class="button-1" v-if="change.some((item) => item !== null)">
@@ -47,6 +51,11 @@ const settigns = [
 ]
 
 store.dispatch('defenicoes/getSettings')
+
+const mapa = computed(() => {
+  console.lo
+  return store.getters.getMapa
+})
 
 const response = computed(() => {
   return store.getters['alert/getResponse']
@@ -138,6 +147,32 @@ const change_visivel = () => {
 onBeforeMount(change_visivel)
 
 const version = __APP_VERSION__
+
+function upload() {
+  document.getElementById('file').click()
+}
+
+function handleFile(event) {
+  const file = event.target.files[0]
+
+  if (!file) return
+
+  const reader = new FileReader()
+
+  reader.onload = (e) => {
+    try {
+      const json = JSON.parse(e.target.result)
+      localStorage.setItem('mapa', JSON.stringify(json))
+      store.commit('setMapa', json)
+    } catch (error) {
+      console.error('Erro ao ler JSON:', error)
+      store.commit('alert/setBtn', 'alert')
+      store.commit('alert/setText', `O ficheiro não é um JSON válido.`)
+      store.commit('alert/setAlert')
+    }
+  }
+  reader.readAsText(file)
+}
 </script>
 
 <style scoped>
@@ -182,6 +217,10 @@ button {
 
 .button-1 {
   background-color: #d40700;
+}
+.button-2 {
+  background-color: #b4af27;
+  margin-bottom: 1rem;
 }
 
 .input-erro {

@@ -61,8 +61,10 @@ const defenicoes = {
         localStorage.setItem('def', JSON.stringify(cleaned))
       }
     },
-    getSettings({ dispatch }) {
+    getSettings({ commit, dispatch }) {
       let settings = JSON.parse(localStorage.getItem('def')) || {}
+      let mapa = JSON.parse(localStorage.getItem('mapa'))
+      commit('setMapa', mapa, { root: true })
       dispatch('setSettings', settings)
     },
     cache({ commit }) {

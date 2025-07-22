@@ -75,11 +75,13 @@
       </div>
       <button @click.prevent="alert" type="submit">Preencher</button>
     </div>
+    <RandomMap v-if="random_map" @dblclick.stop="random_map = !random_map" />
   </div>
 </template>
 
 <script setup>
 import IconBack from '@/components/icons/IconBack.vue'
+import RandomMap from '@/components/RandomMap.vue'
 import { previousRoute, router } from '@/router'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
@@ -88,9 +90,36 @@ import { useStore } from 'vuex'
 const store = useStore()
 const route = useRoute()
 
+const random_map = ref(false)
+const reg_map = ref(localStorage.getItem('reg_map'))
+
 onMounted(() => {
   store.commit('setPage', 'quarto')
+  if (reg_map.value && store.getters.getMapa) {
+    const reg_map = JSON.parse(localStorage.getItem('reg_map'))
+    if (!isHoje(reg_map[0].timestamp)) {
+      random_map.value = true
+    }
+  } else if (store.getters.getMapa) {
+    random_map.value = true
+  } else {
+    store.commit('alert/setBtn', 'alert')
+    store.commit('alert/setText', `Mapa do edifício indisponível!`)
+    store.commit('alert/setAlert')
+  }
 })
+
+function isHoje(timestamp) {
+  const hoje = new Date()
+  const data = new Date(timestamp)
+
+  return (
+    hoje.getFullYear() === data.getFullYear() &&
+    hoje.getMonth() === data.getMonth() &&
+    hoje.getDate() === data.getDate()
+  )
+}
+
 const day = new Date().getDate()
 const monthNames = [
   'Janeiro',
@@ -118,6 +147,12 @@ const temp_fria = ref(null)
 const cloro_fria = ref(null)
 const ph_fria = ref(null)
 const comentarios = ref('')
+
+setTimeout(() => {
+  if (random_map.value && !redirect.value) {
+    quarto.value = store.getters.getLocal ? store.getters.getLocal.val : null
+  }
+}, 100)
 
 const redirect = ref(false)
 if (previousRoute.value?.path === '/table' && route.path === '/quartos' && store.getters.getEdit) {
@@ -235,7 +270,23 @@ async function preencher() {
     ano: new Date().getFullYear(),
     btn: true,
   }
-
+  if (random_map.value && !redirect.value) {
+    const newReg = store.getters.getLocal
+    console.log(newReg.prop)
+    newReg.val = quarto.value
+    console.log(newReg)
+    if (reg_map.value) {
+      const raw = reg_map.value
+      const reg = JSON.parse(raw)
+      console.log(reg)
+      reg.unshift({ id: `${newReg.prop}:${newReg.val}`, timestamp: Date.now() })
+      if (reg.length > 5) reg.length = 5
+      localStorage.setItem('reg_map', JSON.stringify(reg))
+    } else {
+      const write = [{ id: `${newReg.prop}:${newReg.val}`, timestamp: Date.now() }]
+      localStorage.setItem('reg_map', JSON.stringify(write))
+    }
+  }
   try {
     const response = await store.dispatch('preencherSheet', payload)
     if (response.status === 200) {

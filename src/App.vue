@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { RouterView, useRoute } from 'vue-router'
+import { RouterView } from 'vue-router'
 import { useStore } from 'vuex'
 import { previousRoute, router } from './router'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
@@ -32,7 +32,9 @@ const spinner = computed(() => {
   return store.getters.getSpinner
 })
 
-document.addEventListener('contextmenu', (event) => event.preventDefault())
+store.commit('setMapa', JSON.parse(localStorage.getItem('mapa')))
+
+/* document.addEventListener('contextmenu', (event) => event.preventDefault())
 
 // Disable F12, Ctrl+Shift+I
 document.addEventListener('keydown', (event) => {
@@ -81,7 +83,7 @@ function stopApp() {
 }
 
 // Call the detection function
-detectDevTools()
+detectDevTools() */
 
 const update = ref(false)
 

@@ -12,6 +12,8 @@ const store = createStore({
     spinner: false,
     linhas: [],
     change: [],
+    mapa: {},
+    local: null,
     restore: {
       ph: null,
       num_banhistas: null,
@@ -54,6 +56,12 @@ const store = createStore({
     getEdit(state) {
       return state.edit
     },
+    getMapa(state) {
+      return state.mapa
+    },
+    getLocal(state) {
+      return state.local
+    },
   },
   mutations: {
     setGoogleCredential(state, token) {
@@ -82,6 +90,12 @@ const store = createStore({
     },
     setEdit(state, payload) {
       state.edit = payload
+    },
+    setMapa(state, payload) {
+      state.mapa = payload
+    },
+    setLocal(state, payload) {
+      state.local = payload
     },
   },
   actions: {
