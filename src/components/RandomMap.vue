@@ -6,7 +6,7 @@
           <span
             v-for="(char, i) in propChars"
             :key="`prop-${char}-${i}`"
-            :style="{ transitionDelay: `${i * 0.12}s`, marginLeft: i == 5 ? '0.4rem' : '' }"
+            :style="{ transitionDelay: `${i * 0.105}s`, marginLeft: i == 5 ? '0.4rem' : '' }"
             class="char"
             >{{ char }}</span
           >
@@ -17,7 +17,7 @@
           <span
             v-for="(char, i) in valChars"
             :key="`val-${char}-${i}`"
-            :style="{ transitionDelay: `${i * 0.12}s` }"
+            :style="{ transitionDelay: `${i * 0.105}s` }"
             class="char"
             >{{ char }}</span
           >
@@ -59,7 +59,7 @@ watch(
     if (newVal) {
       setInterval(() => {
         valChars.value = newVal.split('')
-      }, 1000)
+      }, 900)
     }
   },
 )

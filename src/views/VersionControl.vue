@@ -1,8 +1,8 @@
 <template>
   <div class="page">
-    <h4>{{ version }}</h4>
+    <h3 class="margin">{{ version }}</h3>
     <div class="width">
-      <button @click="apagar_cache" class="button-1">Apagar Cache</button>
+      <button @click="apagar_cache" class="button-1"><h3>Apagar Cache</h3></button>
     </div>
   </div>
 </template>
@@ -62,9 +62,11 @@ button {
   font-size: 16px;
   cursor: pointer;
 }
-h4 {
-  margin-bottom: 1rem;
+h3 {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   font-weight: 600;
+}
+.margin {
+  margin-bottom: 1rem;
 }
 </style>
