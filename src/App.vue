@@ -34,7 +34,7 @@ const spinner = computed(() => {
 
 store.commit('setMapa', JSON.parse(localStorage.getItem('mapa')))
 
-/* document.addEventListener('contextmenu', (event) => event.preventDefault())
+document.addEventListener('contextmenu', (event) => event.preventDefault())
 
 // Disable F12, Ctrl+Shift+I
 document.addEventListener('keydown', (event) => {
@@ -83,7 +83,7 @@ function stopApp() {
 }
 
 // Call the detection function
-detectDevTools() */
+detectDevTools()
 
 const update = ref(false)
 
