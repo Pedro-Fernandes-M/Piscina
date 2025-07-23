@@ -75,7 +75,11 @@
       </div>
       <button @click.prevent="alert" type="submit">Preencher</button>
     </div>
-    <RandomMap v-if="random_map" @dblclick.stop="random_map = !random_map" />
+    <Transition name="fade-slide" mode="out-in">
+      <RandomMap v-if="random_map">
+        <IconBack @click="random_map = !random_map" class="rotate"></IconBack>
+      </RandomMap>
+    </Transition>
   </div>
 </template>
 
@@ -373,5 +377,9 @@ h2 {
   padding: 1.8rem 1.5rem 0 1.1rem;
   position: absolute;
   top: 0;
+}
+
+.rotate {
+  rotate: -180deg;
 }
 </style>

@@ -47,7 +47,7 @@ function input(input) {
   align-items: center;
   text-align: center;
   background-color: rgb(64, 66, 67);
-  padding: 0.85rem;
+  padding: 1rem;
   border-radius: 0.75rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* shadow */
   width: 17rem;
@@ -99,7 +99,7 @@ button {
 }
 
 .width {
-  max-height: 75%;
+  max-height: 100%;
   overflow-y: auto;
   margin-bottom: 0.25rem;
 }

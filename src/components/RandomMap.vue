@@ -19,11 +19,18 @@
             :key="`val-${char}-${i}`"
             :style="{ transitionDelay: `${i * 0.105}s` }"
             class="char"
-            >{{ char }}</span
-          >
+            ><span class="span">
+              {{ char }}
+            </span>
+          </span>
         </transition-group>
       </div>
     </div>
+    <transition name="flip">
+      <div class="bottom" v-if="visible">
+        <slot></slot>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -37,10 +44,11 @@ const mapa = computed(() => {
   return store.getters.getMapa
 })
 
-const propChars = ref(['', ''])
-const valChars = ref(['', ''])
+const propChars = ref([])
+const valChars = ref([])
 
 const escolhido = ref(null)
+const visible = ref(false)
 
 watch(
   () => escolhido.value?.prop,
@@ -59,6 +67,7 @@ watch(
     if (newVal) {
       setInterval(() => {
         valChars.value = newVal.split('')
+        visible.value = true
       }, 900)
     }
   },
@@ -145,8 +154,8 @@ escolherElemento()
   display: inline-block;
   font-size: 2rem;
   transition:
-    transform 0.4s ease,
-    opacity 0.4s ease;
+    transform 0.9s ease,
+    opacity 0.9s ease;
 }
 
 /* Transição de entrada */
@@ -167,5 +176,12 @@ escolherElemento()
 .flip-leave-to {
   transform: rotateX(-90deg);
   opacity: 0;
+}
+
+.bottom {
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 3rem;
+  min-height: 3rem;
 }
 </style>

@@ -10,4 +10,4 @@ const version =
     ? commitCount.toString().split('').join('.')
     : '0.' + commitCount.toString().split('').join('.')
 
-fs.writeFileSync('.env', `VITE_APP_VERSION=V${version}\n`)
+fs.writeFileSync('.env', `VITE_APP_VERSION=V_${version}\n`)

@@ -12,8 +12,8 @@
         <input type="file" accept=".json" id="file" @change="handleFile" style="display: none" />
       </div>
       <button class="button-2" @click="upload">
-        <span v-if="mapa != null" class="span"><IconReUpload /> Reupload Mapa </span>
-        <span v-else><IconUpload /> Upload Mapa </span>
+        <span v-if="mapa != null" class="span"><IconReUpload /> Alterar Mapa </span>
+        <span v-else><IconUpload /> Carregar Mapa </span>
       </button>
 
       <div :class="change.some((item) => item !== null) ? 'gap' : 'no-gap'">

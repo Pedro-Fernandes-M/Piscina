@@ -2,7 +2,7 @@
   <div class="page">
     <h3 class="margin">{{ version }}</h3>
     <div class="width">
-      <button @click="apagar_cache" class="button-1"><h3>Apagar Cache</h3></button>
+      <button @click="apagar_cache" class="button-1"><h3>Apagar Cache e Dados</h3></button>
     </div>
   </div>
 </template>
@@ -30,16 +30,14 @@ const apagar_cache = async () => {
   store.commit('alert/setBtn', 'confirm')
   store.commit(
     'alert/setText',
-    'Pretende apagar cache e todas as variáveis armazenadas?\n(Apenas recomendado em caso de erros persistentes!)',
+    `Pretende apagar cache e todas as variáveis armazenadas? \n
+    (Apenas recomendado em caso de erros persistentes!)`,
   )
   store.commit('alert/setAlert')
 }
 
 watch(response, async (novo) => {
   if (novo) {
-    localStorage.removeItem('logs')
-    localStorage.removeItem('logs1')
-    localStorage.removeItem('logs2')
     const done = await store.dispatch('defenicoes/cache')
     if (done) {
       store.commit('alert/setBtn', 'alert')

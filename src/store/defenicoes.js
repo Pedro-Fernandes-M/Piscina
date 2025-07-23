@@ -70,6 +70,10 @@ const defenicoes = {
     cache({ commit }) {
       commit('setGoogleCredential', null, { root: true })
       localStorage.removeItem('token')
+      localStorage.removeItem('logs')
+      localStorage.removeItem('logs1')
+      localStorage.removeItem('logs2')
+      localStorage.removeItem('reg_map')
       if ('caches' in window) {
         caches.keys().then((names) => {
           for (let name of names) {
