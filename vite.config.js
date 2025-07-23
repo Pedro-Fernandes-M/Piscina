@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         registerType: 'autoUpdate',
         injectRegister: 'auto',
-        includeAssets: ['assets/logo.png'],
+        includeAssets: ['logo.png'],
         globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
         navigateFallback: '/Piscina/',
         devOptions: {
