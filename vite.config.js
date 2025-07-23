@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => {
         registerType: 'autoUpdate',
         injectRegister: 'auto',
         globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+        navigateFallback: '/',
         includeAssets: ['logo.png'],
         devOptions: {
           enabled: false,
@@ -40,12 +41,17 @@ export default defineConfig(({ mode }) => {
           dir: 'ltr',
         },
         workbox: {
+          navigateFallback: '/index.html',
+          navigateFallbackDenylist: [/\/api\//],
           runtimeCaching: [
             {
-              urlPattern: /^https:\/\/your-api-domain\.com\//,
+              urlPattern: /^\/Piscina\/$/,
               handler: 'NetworkFirst',
               options: {
-                cacheName: 'api-cache',
+                cacheName: 'start-page-cache',
+                expiration: {
+                  maxEntries: 1,
+                },
               },
             },
           ],

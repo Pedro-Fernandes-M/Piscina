@@ -96,6 +96,7 @@ const route = useRoute()
 
 const random_map = ref(false)
 const reg_map = ref(localStorage.getItem('reg_map'))
+const map = ref(false)
 
 onMounted(() => {
   store.commit('setPage', 'quarto')
@@ -103,9 +104,11 @@ onMounted(() => {
     const reg_map = JSON.parse(localStorage.getItem('reg_map'))
     if (!isHoje(reg_map[0].timestamp)) {
       random_map.value = true
+      map.value = true
     }
   } else if (store.getters.getMapa) {
     random_map.value = true
+    map.value = true
   } else {
     store.commit('alert/setBtn', 'alert')
     store.commit('alert/setText', `Mapa do edifício indisponível!`)
@@ -274,15 +277,12 @@ async function preencher() {
     ano: new Date().getFullYear(),
     btn: true,
   }
-  if (random_map.value && !redirect.value) {
+  if (map.value && !redirect.value) {
     const newReg = store.getters.getLocal
-    console.log(newReg.prop)
     newReg.val = quarto.value
-    console.log(newReg)
     if (reg_map.value) {
       const raw = reg_map.value
       const reg = JSON.parse(raw)
-      console.log(reg)
       reg.unshift({ id: `${newReg.prop}:${newReg.val}`, timestamp: Date.now() })
       if (reg.length > 5) reg.length = 5
       localStorage.setItem('reg_map', JSON.stringify(reg))
