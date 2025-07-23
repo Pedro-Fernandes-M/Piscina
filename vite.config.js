@@ -15,11 +15,11 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         registerType: 'autoUpdate',
         injectRegister: 'auto',
+        includeAssets: ['assets/logo.png'],
         globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
-        navigateFallback: '/',
-        includeAssets: ['logo.png'],
+        navigateFallback: '/Piscina/',
         devOptions: {
-          enabled: false,
+          enabled: true,
         },
         manifest: {
           name: 'Registos',
@@ -34,14 +34,14 @@ export default defineConfig(({ mode }) => {
             {
               src: 'logo.ico',
               sizes: '192x192',
-              type: 'image/png',
+              type: 'image/x-icon',
             },
           ],
           lang: 'pt-PT',
           dir: 'ltr',
         },
         workbox: {
-          navigateFallback: '/index.html',
+          navigateFallback: '/Piscina/',
           navigateFallbackDenylist: [/\/api\//],
           runtimeCaching: [
             {
