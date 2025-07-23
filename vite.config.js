@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => {
         injectRegister: 'auto',
         includeAssets: ['logo.png'],
         globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
-        navigateFallback: '/Piscina/',
+
         devOptions: {
           enabled: true,
         },
@@ -41,8 +41,6 @@ export default defineConfig(({ mode }) => {
           dir: 'ltr',
         },
         workbox: {
-          navigateFallback: '/Piscina/',
-          navigateFallbackDenylist: [/\/api\//],
           runtimeCaching: [
             {
               urlPattern: /^\/Piscina\/$/,
