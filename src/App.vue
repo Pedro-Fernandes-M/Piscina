@@ -36,7 +36,7 @@ store.commit('setMapa', JSON.parse(localStorage.getItem('mapa')))
 
 document.addEventListener('contextmenu', (event) => event.preventDefault())
 
-/* // Disable F12, Ctrl+Shift+I
+// Disable F12, Ctrl+Shift+I
 document.addEventListener('keydown', (event) => {
   if (
     event.key === 'F12' ||
@@ -83,7 +83,7 @@ function stopApp() {
 }
 
 // Call the detection function
-detectDevTools() */
+detectDevTools()
 
 const update = ref(false)
 
