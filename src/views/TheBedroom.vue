@@ -3,78 +3,90 @@
     <div class="arrow">
       <IconBack @click="router.push('/home')"></IconBack>
     </div>
-    <div class="form">
-      <div class="center">
-        <h2>Local</h2>
-        <h3>{{ day }} de {{ monthN }}</h3>
-      </div>
-      <div class="center1">
-        <div class="input">
-          <label for="">Local</label>
-          <input :class="[quarto === '' ? 'input-erro' : '']" type="text" v-model.trim="quarto" />
-        </div>
-        <div class="center padding-1">
-          <h3>Água Quente</h3>
-        </div>
-        <div class="input">
-          <label for="">Temperatura</label>
-          <input
-            :class="[temp_quente === '' ? 'input-erro' : '']"
-            type="number"
-            v-model="temp_quente"
-          />
-        </div>
-        <div class="input">
-          <label for="">Cloro</label>
-          <input
-            :class="[cloro_quente === '' ? 'input-erro' : '']"
-            type="number"
-            v-model="cloro_quente"
-          />
-        </div>
-        <div class="input">
-          <label for="">pH</label>
-          <input
-            :class="[ph_quente === '' ? 'input-erro' : '']"
-            type="number"
-            v-model="ph_quente"
-          />
-        </div>
-        <div class="center padding-1">
-          <h3>Água Fria</h3>
-        </div>
-        <div class="input">
-          <label for="">Temperatura</label>
-          <input
-            :class="[temp_fria === '' ? 'input-erro' : '']"
-            type="number"
-            v-model="temp_fria"
-          />
-        </div>
-        <div class="input">
-          <label for="">Cloro</label>
-          <input
-            :class="[cloro_fria === '' ? 'input-erro' : '']"
-            type="number"
-            v-model="cloro_fria"
-          />
-        </div>
-        <div class="input">
-          <label for="">pH</label>
-          <input :class="[ph_fria === '' ? 'input-erro' : '']" type="number" v-model="ph_fria" />
-        </div>
+    <Transition name="fade-slide">
+      <div class="form-wrapper" v-if="loaded">
+        <div class="form">
+          <div class="center">
+            <h2>Local</h2>
+            <h3>{{ day }} de {{ monthN }}</h3>
+          </div>
+          <div class="center1">
+            <div class="input">
+              <label for="">Local</label>
+              <input
+                :class="[quarto === '' ? 'input-erro' : '']"
+                type="text"
+                v-model.trim="quarto"
+              />
+            </div>
+            <div class="center padding-1">
+              <h3>Água Quente</h3>
+            </div>
+            <div class="input">
+              <label for="">Temperatura</label>
+              <input
+                :class="[temp_quente === '' ? 'input-erro' : '']"
+                type="number"
+                v-model="temp_quente"
+              />
+            </div>
+            <div class="input">
+              <label for="">Cloro</label>
+              <input
+                :class="[cloro_quente === '' ? 'input-erro' : '']"
+                type="number"
+                v-model="cloro_quente"
+              />
+            </div>
+            <div class="input">
+              <label for="">pH</label>
+              <input
+                :class="[ph_quente === '' ? 'input-erro' : '']"
+                type="number"
+                v-model="ph_quente"
+              />
+            </div>
+            <div class="center padding-1">
+              <h3>Água Fria</h3>
+            </div>
+            <div class="input">
+              <label for="">Temperatura</label>
+              <input
+                :class="[temp_fria === '' ? 'input-erro' : '']"
+                type="number"
+                v-model="temp_fria"
+              />
+            </div>
+            <div class="input">
+              <label for="">Cloro</label>
+              <input
+                :class="[cloro_fria === '' ? 'input-erro' : '']"
+                type="number"
+                v-model="cloro_fria"
+              />
+            </div>
+            <div class="input">
+              <label for="">pH</label>
+              <input
+                :class="[ph_fria === '' ? 'input-erro' : '']"
+                type="number"
+                v-model="ph_fria"
+              />
+            </div>
 
-        <div class="input padding-1">
-          <label for="">Comentário</label>
-          <input
-            :class="[comentarios === null ? 'input-erro' : '']"
-            type="text"
-            v-model="comentarios"
-          />
+            <div class="input padding-1">
+              <label for="">Comentário</label>
+              <input
+                :class="[comentarios === null ? 'input-erro' : '']"
+                type="text"
+                v-model="comentarios"
+              />
+            </div>
+          </div>
+          <button @click.prevent="alert" type="submit">Preencher</button>
         </div>
       </div>
-      <button @click.prevent="alert" type="submit">Preencher</button>
-    </div>
+    </Transition>
     <Transition name="fade-slide" mode="out-in">
       <RandomMap v-if="random_map">
         <IconBack @click="random_map = !random_map" class="rotate"></IconBack>
@@ -97,8 +109,9 @@ const route = useRoute()
 const random_map = ref(false)
 const reg_map = ref(localStorage.getItem('reg_map'))
 const map = ref(false)
+const loaded = ref(false)
 
-onMounted(() => {
+onMounted(async () => {
   store.commit('setPage', 'quarto')
   if (reg_map.value && store.getters.getMapa) {
     const reg_map = JSON.parse(localStorage.getItem('reg_map'))
@@ -114,6 +127,8 @@ onMounted(() => {
     store.commit('alert/setText', `Mapa do edifício indisponível!`)
     store.commit('alert/setAlert')
   }
+  await new Promise((resolve) => setTimeout(resolve, 100))
+  loaded.value = true
 })
 
 function isHoje(timestamp) {
@@ -320,7 +335,7 @@ async function preencher() {
 button {
   margin-top: 1rem;
   padding: 10px 20px;
-  background-color: #00bcd4;
+  background: #c49c27;
   color: white;
   border: none;
   border-radius: 8px;
@@ -353,11 +368,11 @@ input {
 }
 
 input:focus {
-  box-shadow: 0 0 0 2px #00bcd4;
+  box-shadow: 0 0 0 2px #c49c27;
 }
 
 .input-erro {
-  box-shadow: 0 0 0 2px #d42e00;
+  box-shadow: 0 0 0 2px #b10c06;
 }
 
 h2 {
@@ -381,5 +396,12 @@ h2 {
 
 .rotate {
   rotate: -180deg;
+}
+.form-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+  min-width: 100%;
 }
 </style>

@@ -11,11 +11,37 @@
         />
         <input type="file" accept=".json" id="file" @change="handleFile" style="display: none" />
       </div>
-      <button class="button-2" @click="upload">
-        <span v-if="mapa != null" class="span"><IconReUpload /> Alterar Mapa </span>
-        <span v-else><IconUpload /> Carregar Mapa </span>
-      </button>
-
+      <div class="flex">
+        <div class="space" @click="open = !open">
+          <span>Avançadas</span>
+          <span v-if="!open">></span>
+          <span v-else class="rotate">></span>
+        </div>
+        <transition name="dropdown">
+          <div class="flex-1" v-if="open">
+            <button :class="[mapa != null ? 'button-2' : 'button-4']" @click="upload">
+              <div v-if="mapa != null" class="span"><IconReUpload /> Alterar Mapa</div>
+              <div v-else class="span"><IconUpload /> Carregar Mapa</div>
+            </button>
+            <div>
+              <label>Latitude</label>
+              <input
+                type="text"
+                v-model.trim="change[change?.length - 2]"
+                :class="[change[change?.length - 2] == '' ? 'input-erro' : '']"
+              />
+            </div>
+            <div>
+              <label>Longitude</label>
+              <input
+                type="text"
+                v-model.trim="change[change?.length - 1]"
+                :class="[change[change?.length - 1] == '' ? 'input-erro' : '']"
+              />
+            </div>
+          </div>
+        </transition>
+      </div>
       <div :class="change.some((item) => item !== null) ? 'gap' : 'no-gap'">
         <button @click="guardar" class="button-3">Guardar</button>
         <transition>
@@ -66,6 +92,7 @@ const response = computed(() => {
 })
 
 const change = ref([null, null, null, null, null, null])
+const open = ref(false)
 
 const change1 = computed(() => {
   return [
@@ -75,6 +102,8 @@ const change1 = computed(() => {
     store.getters['defenicoes/getPiscExt'],
     store.getters['defenicoes/getEspacos'],
     store.getters['defenicoes/getAssinatura'],
+    store.getters['defenicoes/getLat'],
+    store.getters['defenicoes/getLong'],
   ]
 })
 change.value = change1.value
@@ -95,6 +124,8 @@ const guardar = () => {
         PiscExt: change.value[3] || '',
         Espacos: change.value[4] || '',
         Assinatura: change.value[5] || '',
+        Lat: change.value[6] || '',
+        Long: change.value[7] || '',
         store: 1,
       }
       store.dispatch('defenicoes/setSettings', payload)
@@ -119,6 +150,14 @@ watch(response, async (novo) => {
   if (novo && reset.value) {
     await store.dispatch('defenicoes/reset')
     reset.value = false
+  }
+})
+
+watch(mapa, (novo) => {
+  if (novo != null && localStorage.getItem('mapa') != null) {
+    store.commit('alert/setBtn', 'alert')
+    store.commit('alert/setText', `Mapa atualizado!`)
+    store.commit('alert/setAlert')
   }
 })
 
@@ -187,7 +226,7 @@ input:focus {
 button {
   margin-top: 1rem;
   padding: 10px 30px;
-  background-color: #00bcd4;
+  background-color: #0199ad;
   color: white;
   border: none;
   border-radius: 8px;
@@ -196,6 +235,7 @@ button {
 }
 
 .button-2 {
+  width: 100%;
   background-color: #333;
   color: #fff;
   padding: 10px 20px;
@@ -213,8 +253,20 @@ button {
     inset -2px -2px 5px rgba(255, 255, 255, 0.05);
 }
 
+.button-4 {
+  width: 100%;
+  background-color: #c0b343;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+
 .input-erro {
-  box-shadow: 0 0 0 2px #d42e00;
+  box-shadow: 0 0 0 2px #b10c06;
 }
 
 h2 {
@@ -224,7 +276,7 @@ h2 {
   margin-top: 0.5rem;
 }
 .button-1 {
-  background-color: #d40700;
+  background-color: #b10c06;
 }
 
 .gap {
@@ -252,5 +304,41 @@ h2 {
   align-items: center;
   text-align: center;
   gap: 0.3rem;
+}
+
+.flex {
+  display: grid;
+  border-bottom: 1px solid whitesmoke;
+  padding-bottom: 0.8rem;
+}
+
+.flex-1 {
+  display: grid;
+  width: 100%;
+  gap: 1rem;
+}
+
+.space {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+.rotate {
+  rotate: 90deg;
+}
+
+/* Transição para altura suave */
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: all 0.4s ease-in-out;
+  max-height: 200px;
+  opacity: 1;
+}
+
+.dropdown-enter-from,
+.dropdown-leave-to {
+  max-height: 0;
+  opacity: 0;
 }
 </style>

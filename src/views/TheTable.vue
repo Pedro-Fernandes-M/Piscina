@@ -1,112 +1,123 @@
 <template>
   <div class="page">
     <div class="arrow">
-      <IconBack @click="router.push('/home')"></IconBack>
+      <IconBack @click="goHome"></IconBack>
     </div>
-    <div class="form">
-      <div class="center">
-        <div class="link">
-          <IconLink @click="abrirLink" v-if="link_v"></IconLink>
-        </div>
-        <h2 class="text" v-if="redirect">Espaços</h2>
-        <h2 @click="mudarSheet" class="text" v-else>
-          {{ piscina }}
-        </h2>
-        <h3>{{ day }} de {{ month }}</h3>
-      </div>
-      <div v-if="data" class="gap">
-        <div v-for="(item, index) in data" :key="index">
-          <div v-if="item.length > 0" class="grid">
-            <span class="grid1 margin">
-              <span class="font" v-if="redirect"
-                >Local
-                <span>
-                  {{ item[1] }}
-                </span>
-              </span>
-              <span class="font" v-else>
-                Hora
-                <span>
-                  {{ item[0] }}
-                </span>
-              </span>
-            </span>
-            <div v-if="redirect" class="grid2 grid3">
-              <span
-                v-for="(data, index1) in item.slice(2).filter((item) => item !== assinatura)"
-                :key="index1"
-                :class="[header1[index1] === 'Comentários' ? 'grid2' : '']"
-              >
-                <span class="weight">
-                  {{ header1[index1] }}
-                </span>
-                <br />
-                {{ data == '' ? '--' : data }}
-              </span>
-              <span class="grid1">
-                <span class="font"> Responsável </span>
-                {{
-                  item[item.length - 1] === assinatura
-                    ? item[item.length - 1]
-                    : item[item.length - 2]
-                }}
-              </span>
+    <Transition name="fade-slide">
+      <div class="form-wrapper" v-if="dispatch">
+        <div class="form">
+          <div class="center">
+            <div class="link">
+              <IconLink @click="abrirLink" v-if="link_v"></IconLink>
             </div>
-            <div v-else class="grid2 grid3">
-              <span
-                v-for="(data, index1) in item.slice(1).filter((item) => item !== assinatura)"
-                :key="index1"
-                :class="[header[index1] === 'Obs.' ? 'grid2' : '']"
-              >
-                <span class="weight">
-                  {{ header[index1] }}
+            <h2 class="text" v-if="redirect">Espaços</h2>
+            <h2 @click="mudarSheet" class="text" v-else>
+              {{ piscina }}
+            </h2>
+            <h3>{{ day }} de {{ month }}</h3>
+          </div>
+          <div v-if="data" class="gap">
+            <div v-for="(item, index) in data" :key="index">
+              <div v-if="item?.length > 0" class="grid">
+                <span class="grid1 margin">
+                  <span class="font" v-if="redirect"
+                    >Local
+                    <span>
+                      {{ item[1] }}
+                    </span>
+                  </span>
+                  <span class="font" v-else>
+                    Hora
+                    <span>
+                      {{ item[0] }}
+                    </span>
+                  </span>
                 </span>
-                <br />
-                {{ data == '' ? '--' : data }}
-              </span>
-              <span class="grid1">
-                <span class="font"> Responsável </span>
-                {{
-                  item[item.length - 1] === assinatura
-                    ? item[item.length - 1]
-                    : item[item.length - 2]
-                }}
-              </span>
+                <div v-if="redirect" class="grid2 grid3">
+                  <span
+                    v-for="(data, index1) in item.slice(2).filter((item) => item !== assinatura)"
+                    :key="index1"
+                    :class="[header1[index1] === 'Comentários' ? 'grid2' : '']"
+                  >
+                    <span class="weight">
+                      {{ header1[index1] }}
+                    </span>
+                    <br />
+                    {{ data == '' ? '--' : data }}
+                  </span>
+                  <span class="grid1">
+                    <span class="font"> Responsável </span>
+                    {{
+                      item[item.length - 1] === assinatura
+                        ? item[item.length - 1]
+                        : item[item.length - 2]
+                    }}
+                  </span>
+                </div>
+                <div v-else class="grid2 grid3">
+                  <span
+                    v-for="(data, index1) in item.slice(1).filter((item) => item !== assinatura)"
+                    :key="index1"
+                    :class="[header[index1] === 'Obs.' ? 'grid2' : '']"
+                  >
+                    <span class="weight">
+                      {{ header[index1] }}
+                    </span>
+                    <br />
+                    {{ data == '' ? '--' : data }}
+                  </span>
+                  <span class="grid1">
+                    <span class="font"> Responsável </span>
+                    {{
+                      item[item.length - 1] === assinatura
+                        ? item[item.length - 1]
+                        : item[item.length - 2]
+                    }}
+                  </span>
+                </div>
+                <button class="button" @click="alert(index)">
+                  <div class="forma">
+                    <IconTrash />
+                  </div>
+                </button>
+                <button class="button btn-color" @click="alert1(index, true)">
+                  <div class="forma">
+                    <IconEdit />
+                  </div>
+                </button>
+              </div>
             </div>
-            <button class="button" @click="alert(index)">
-              <div class="forma">
-                <IconTrash />
-              </div>
-            </button>
-            <button class="button btn-color" @click="alert1(index, true)">
-              <div class="forma">
-                <IconEdit />
-              </div>
+            <div v-if="data.length === 0" class="center">Sem registos neste dia!</div>
+          </div>
+          <div v-else class="center">Sem dados</div>
+          <div class="center">
+            <button @click="lerDados" :class="redirect ? 'button4 button1' : 'button1'">
+              Refresh
             </button>
           </div>
         </div>
-        <div v-if="data.length === 0" class="center">Sem registos neste dia!</div>
       </div>
-      <div v-else class="center">Sem dados</div>
-      <div class="center">
-        <button @click="lerDados" class="button1">Refresh</button>
-      </div>
-    </div>
+    </Transition>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeMount, ref, watch } from 'vue'
 import { useStore } from 'vuex'
-import { useRoute } from 'vue-router'
+import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 import IconTrash from '@/components/icons/IconTrash.vue'
-import { previousRoute, router } from '@/router'
+import { previousRoute } from '@/router'
 import IconEdit from '@/components/icons/IconEdit.vue'
 import IconBack from '@/components/icons/IconBack.vue'
 import IconLink from '@/components/icons/IconLink.vue'
 
 const store = useStore()
 const route = useRoute()
+const router = useRouter()
+
+const goHome = () => {
+  router.push('/home')
+}
 
 const redirect = ref(false)
 if (previousRoute.value?.path === '/quartos' && route.path === '/table') {
@@ -150,18 +161,19 @@ const monthNames = [
   'Dezembro',
 ]
 const month = monthNames[new Date().getMonth()]
+const dispatch = ref(null)
 
 const start = async () => {
   store.commit('setPage', 'table')
   if (redirect.value) {
-    await store.dispatch('lerPlanilha', {
+    dispatch.value = await store.dispatch('lerPlanilha', {
       dia: day,
       mes: new Date().getMonth() + 1,
       ano: new Date().getFullYear(),
       options: 'quartos',
     })
   } else {
-    await store.dispatch('lerPlanilha', {
+    dispatch.value = await store.dispatch('lerPlanilha', {
       dia: day,
       mes: month,
       options: 'piscina',
@@ -170,7 +182,7 @@ const start = async () => {
   valid_link()
 }
 
-onMounted(start, valid_link())
+onBeforeMount(start, valid_link())
 
 const header = ref([
   'Ph',
@@ -196,10 +208,12 @@ const header1 = ref([
 
 const data = computed(() => {
   const values = []
-  if (store.getters.getTabela.length > 0) {
+  if (store.getters.getTabela?.length > 0) {
     for (let i = 0; i < store.getters.getTabela.length; i++) {
       values.push(store.getters.getTabela[i])
     }
+  } else if (store.getters.getTabela === null && store.getters.getGoogleCredential === null) {
+    return null
   } else if (redirect.value) {
     return JSON.parse(localStorage.getItem('logs2'))
   } else if (store.getters.getPiscina === 'Piscina Interior') {
@@ -208,6 +222,10 @@ const data = computed(() => {
     return JSON.parse(localStorage.getItem('logs1'))
   }
   return values
+})
+
+onBeforeRouteLeave(() => {
+  store.commit('setTabela', null)
 })
 
 async function lerDados() {
@@ -356,7 +374,7 @@ function abrirLink() {
 <style scoped>
 .button1 {
   padding: 10px 20px;
-  background-color: #00bcd4;
+  background-color: #0199ad;
   color: white;
   border: none;
   border-radius: 8px;
@@ -365,6 +383,10 @@ function abrirLink() {
   transition: background 0.2s ease;
   margin-top: 1.5rem;
   width: 100%;
+}
+
+.button4 {
+  background: #c49c27;
 }
 .btn {
   width: 100%;
@@ -416,7 +438,7 @@ function abrirLink() {
   margin-left: 0.8rem;
   margin-bottom: 0.5rem;
   height: 2rem;
-  background-color: #e74c3c;
+  background-color: #b10c06;
   font-weight: 500;
   border: none;
   border-radius: 0.5rem;
@@ -457,7 +479,7 @@ function abrirLink() {
 }
 
 .btn-color {
-  background-color: rgb(39, 105, 197);
+  background-color: #0199ad;
 }
 
 .link {
@@ -466,5 +488,12 @@ function abrirLink() {
   justify-content: right;
   align-items: center;
   margin-bottom: 1.2rem;
+}
+.form-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+  min-width: 100%;
 }
 </style>

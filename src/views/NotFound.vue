@@ -20,7 +20,7 @@ p {
 }
 
 a {
-  color: #007bff;
+  color: #0199ad;
   text-decoration: none;
   font-weight: 500;
 }

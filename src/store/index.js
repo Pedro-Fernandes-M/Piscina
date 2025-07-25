@@ -27,6 +27,8 @@ const store = createStore({
       observacoes: '',
     },
     edit: false,
+    temp: null,
+    humidity: false,
   },
   getters: {
     getGoogleCredential(state) {
@@ -62,6 +64,12 @@ const store = createStore({
     getLocal(state) {
       return state.local
     },
+    getTemp(state) {
+      return state.temp
+    },
+    getHumidity(state) {
+      return state.humidity
+    },
   },
   mutations: {
     setGoogleCredential(state, token) {
@@ -96,6 +104,12 @@ const store = createStore({
     },
     setLocal(state, payload) {
       state.local = payload
+    },
+    setTemp(state, payload) {
+      state.temp = payload
+    },
+    setHumidity(state, payload) {
+      state.humidity = payload
     },
   },
   actions: {
@@ -438,7 +452,8 @@ const store = createStore({
           )
           commit('alert/setAlert')
           commit('setSpinner', false)
-          return
+          await new Promise((resolve) => setTimeout(resolve, 220))
+          return true
         }
       } else if (rawToken) {
         parsedToken = JSON.parse(rawToken)
@@ -454,7 +469,7 @@ const store = createStore({
           commit('alert/setText', 'Sem login efetuado! \nEfetue login manualmente no botão.')
           commit('alert/setAlert')
           commit('setSpinner', false)
-          return
+          return true
         }
       }
 
@@ -556,6 +571,8 @@ const store = createStore({
           } else {
             localStorage.setItem('logs1', JSON.stringify(dadosLinhas))
           }
+          commit('setSpinner', false)
+          return true
         } else {
           commit('alert/setBtn', 'alert')
           commit('alert/setText', response.status)

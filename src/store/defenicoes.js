@@ -7,6 +7,8 @@ const defenicoes = {
     PiscExt: '',
     Assinatura: '',
     Espacos: '',
+    Lat: '',
+    Long: '',
   },
   getters: {
     getAPI_Key: (state) => state.API_Key,
@@ -15,6 +17,8 @@ const defenicoes = {
     getPiscExt: (state) => state.PiscExt,
     getAssinatura: (state) => state.Assinatura,
     getEspacos: (state) => state.Espacos,
+    getLat: (state) => state.Lat,
+    getLong: (state) => state.Long,
   },
   mutations: {
     setAPI_Key(state, payload) {
@@ -35,6 +39,12 @@ const defenicoes = {
     setEspacos(state, payload) {
       state.Espacos = payload
     },
+    setLat(state, payload) {
+      state.Lat = payload
+    },
+    setLong(state, payload) {
+      state.Long = payload
+    },
   },
   actions: {
     reset({ commit }) {
@@ -44,8 +54,9 @@ const defenicoes = {
       commit('setPiscExt', '')
       commit('setAssinatura', '')
       commit('setEspacos', '')
+      commit('setLat', '')
+      commit('setLong', '')
       localStorage.removeItem('def')
-      console.log('reset')
     },
     setSettings({ commit }, payload) {
       commit('setAPI_Key', payload.API_Key || null)
@@ -54,6 +65,8 @@ const defenicoes = {
       commit('setPiscExt', payload.PiscExt || null)
       commit('setEspacos', payload.Espacos || null)
       commit('setAssinatura', payload.Assinatura || null)
+      commit('setLat', payload.Lat || null)
+      commit('setLong', payload.Long || null)
 
       if (payload.store == 1) {
         // eslint-disable-next-line no-unused-vars

@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         registerType: 'autoUpdate',
         injectRegister: 'auto',
-        includeAssets: ['logo.png'],
+        includeAssets: ['logo_dark.png'],
         globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
 
         devOptions: {

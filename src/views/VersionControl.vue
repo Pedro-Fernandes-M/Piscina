@@ -53,7 +53,7 @@ watch(response, async (novo) => {
 button {
   margin-top: 1rem;
   padding: 10px 30px;
-  background-color: #d40700;
+  background-color: #b10c06;
   color: white;
   border: none;
   border-radius: 8px;

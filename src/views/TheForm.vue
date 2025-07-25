@@ -392,11 +392,11 @@ input {
 }
 
 input:focus {
-  box-shadow: 0 0 0 2px #00bcd4;
+  box-shadow: 0 0 0 2px #0199ad;
 }
 
 .input-erro {
-  box-shadow: 0 0 0 2px #d42e00;
+  box-shadow: 0 0 0 2px #b10c06;
 }
 
 select {
@@ -418,7 +418,7 @@ select {
 button {
   margin-top: 1rem;
   padding: 10px 20px;
-  background-color: #00bcd4;
+  background-color: #0199ad;
   color: white;
   border: none;
   border-radius: 8px;
