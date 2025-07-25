@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => {
           enabled: true,
         },
         manifest: {
-          name: 'Registos',
+          name: 'Registos App',
           short_name: 'Registos',
           description: 'App para registo e controlo de Legionella em piscinas e quartos.',
           start_url: '/Piscina/',
