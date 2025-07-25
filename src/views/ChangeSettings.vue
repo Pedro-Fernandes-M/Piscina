@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2 @dblclick="router.push('/secret')">Definições</h2>
+    <h2 class="dbl-area" @dblclick="router.push('/secret')">Definições</h2>
     <div class="grid">
       <div v-for="(item, id) in settigns" :key="id" class="grid1">
         <label>{{ item }}</label>
@@ -340,5 +340,9 @@ h2 {
 .dropdown-leave-to {
   max-height: 0;
   opacity: 0;
+}
+
+.dbl-area {
+  touch-action: manipulation;
 }
 </style>
