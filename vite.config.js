@@ -32,9 +32,9 @@ export default defineConfig(({ mode }) => {
           theme_color: '#181818',
           icons: [
             {
-              src: 'logo.ico',
+              src: 'logo_dark.png',
               sizes: '192x192',
-              type: 'image/x-icon',
+              type: 'image/png',
             },
           ],
           lang: 'pt-PT',
