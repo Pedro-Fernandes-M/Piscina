@@ -65,5 +65,4 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overscroll-behavior-x: none; /* evita overscroll lateral */
-  touch-action: pan-y; /* permite só scroll vertical */
 }

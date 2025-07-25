@@ -87,7 +87,7 @@ h2 {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.6rem;
 }
 .rotate {
   rotate: -35deg;
