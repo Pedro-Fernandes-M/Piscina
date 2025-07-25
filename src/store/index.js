@@ -469,6 +469,8 @@ const store = createStore({
           commit('alert/setText', 'Sem login efetuado! \nEfetue login manualmente no botão.')
           commit('alert/setAlert')
           commit('setSpinner', false)
+          await new Promise((resolve) => setTimeout(resolve, 220))
+
           return true
         }
       }
