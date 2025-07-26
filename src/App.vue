@@ -15,6 +15,7 @@
       ></AlertCard>
     </transition>
   </router-view>
+  <!--  <div v-else class="full">Only Mobile</div> -->
 </template>
 
 <script setup>
@@ -32,12 +33,14 @@ const spinner = computed(() => {
   return store.getters.getSpinner
 })
 
+const mobile = computed(() => /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent))
+
 store.commit('setMapa', JSON.parse(localStorage.getItem('mapa')))
 
 document.addEventListener('contextmenu', (event) => event.preventDefault())
 
 // Disable F12, Ctrl+Shift+I
-document.addEventListener('keydown', (event) => {
+/* document.addEventListener('keydown', (event) => {
   if (
     event.key === 'F12' ||
     (event.ctrlKey && event.shiftKey && event.key === 'I') ||
@@ -83,7 +86,7 @@ function stopApp() {
 }
 
 // Call the detection function
-detectDevTools()
+detectDevTools() */
 
 const update = ref(false)
 
@@ -172,54 +175,60 @@ onMounted(() => {
   window.addEventListener('offline', updateStatus)
 })
 
-Notification.requestPermission().then((permission) => {
-  if (permission === 'granted') {
-    console.log('Notifications allowed')
+/* if (Notification) {
+  Notification.requestPermission().then((permission) => {
+    if (permission === 'granted') {
+      console.log('Notifications allowed')
 
-    const base = import.meta.env.BASE_URL || '/'
+      const base = import.meta.env.BASE_URL || '/'
 
-    function scheduleNotification() {
-      const now = new Date()
-      const next18h = new Date()
-      next18h.setHours(18, 0, 0, 0)
+      function scheduleNotification() {
+        const now = new Date()
+        const next18h = new Date()
+        next18h.setHours(18, 0, 0, 0)
 
-      if (now > next18h) {
-        // Já passou das 18h hoje, agenda para amanhã
-        next18h.setDate(next18h.getDate() + 1)
+        if (now > next18h) {
+          // Já passou das 18h hoje, agenda para amanhã
+          next18h.setDate(next18h.getDate() + 1)
+        }
+
+        const msUntil18h = next18h - now
+
+        setTimeout(() => {
+          navigator.serviceWorker.getRegistration().then((reg) => {
+            if (reg) {
+              reg.showNotification('Registos', {
+                body: 'Está na hora!',
+                icon: `${base}logo_sticker.png`,
+              })
+            }
+          })
+
+          // Agora agenda para repetir a cada 24h
+          setInterval(
+            () => {
+              navigator.serviceWorker.getRegistration().then((reg) => {
+                if (reg) {
+                  reg.showNotification('Registos', {
+                    body: 'Está na hora!',
+                    icon: `${base}logo_sticker.png`,
+                  })
+                }
+              })
+            },
+            24 * 60 * 60 * 1000,
+          )
+        }, msUntil18h)
       }
 
-      const msUntil18h = next18h - now
-
-      setTimeout(() => {
-        navigator.serviceWorker.getRegistration().then((reg) => {
-          if (reg) {
-            reg.showNotification('Registos', {
-              body: 'Está na hora!',
-              icon: `${base}logo_sticker.png`,
-            })
-          }
-        })
-
-        // Agora agenda para repetir a cada 24h
-        setInterval(
-          () => {
-            navigator.serviceWorker.getRegistration().then((reg) => {
-              if (reg) {
-                reg.showNotification('Registos', {
-                  body: 'Está na hora!',
-                  icon: `${base}logo_sticker.png`,
-                })
-              }
-            })
-          },
-          24 * 60 * 60 * 1000,
-        )
-      }, msUntil18h)
+      scheduleNotification()
     }
-
-    scheduleNotification()
-  }
-})
+  })
+} else {
+  store.commit('alert/setBtn', 'alert')
+  store.commit('alert/setText', `Notificações sem permissão!`)
+  store.commit('alert/setAlert')
+} */
 </script>
 
 <style>
@@ -257,5 +266,15 @@ Notification.requestPermission().then((permission) => {
   100% {
     opacity: 0;
   }
+}
+
+.full {
+  height: 100dvh;
+  width: 100%;
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  text-align: center;
 }
 </style>

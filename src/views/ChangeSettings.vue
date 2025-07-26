@@ -39,6 +39,9 @@
                 :class="[change[change?.length - 1] == '' ? 'input-erro' : '']"
               />
             </div>
+            <div>
+              <button @click="AllowPush" :class="['button-4']">Enable Notifications</button>
+            </div>
           </div>
         </transition>
       </div>
@@ -186,6 +189,30 @@ function handleFile(event) {
     }
   }
   reader.readAsText(file)
+}
+
+function AllowPush() {
+  console.log('permisson')
+  Notification.requestPermission().then((permission) => {
+    console.log('Permissão:', permission)
+    const base = import.meta.env.BASE_URL || '/'
+
+    if (permission === 'granted') {
+      navigator.serviceWorker.ready.then((reg) => {
+        reg.showNotification('Notificação ativada!', {
+          body: 'Push testado com sucesso.',
+          icon: `${base}/logo_sticker.png`, // ajusta conforme necessário
+        })
+      })
+      alert('send')
+    } else if (permission === 'denied') {
+      alert('Usuário negou as notificações.')
+    } else {
+      alert('Permissão de notificações não foi concedida.')
+    }
+  })
+
+  console.log('permisson fim')
 }
 </script>
 
