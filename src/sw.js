@@ -1,4 +1,8 @@
-self.__WB_MANIFEST
+import { precacheAndRoute } from 'workbox-precaching'
+
+// Esse é o placeholder que o Workbox vai substituir no build
+precacheAndRoute(self.__WB_MANIFEST)
+
 const base = import.meta.env.BASE_URL || '/'
 
 self.addEventListener('push', (event) => {
