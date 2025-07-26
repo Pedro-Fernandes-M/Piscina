@@ -40,7 +40,9 @@
               />
             </div>
             <div>
-              <button @click="AllowPush" :class="['button-4']">Enable Notifications</button>
+              <button @click="AllowPush" :class="[pushEnable ? 'button-2 ' : 'button-4 button-5']">
+                Enable Notifications
+              </button>
             </div>
           </div>
         </transition>
@@ -73,6 +75,10 @@ const store = useStore()
 
 onMounted(() => {
   store.commit('setPage', 'settings')
+})
+
+const pushEnable = computed(() => {
+  return 'Notification' in window && Notification.permission === 'granted'
 })
 
 const settigns = [
@@ -192,27 +198,23 @@ function handleFile(event) {
 }
 
 function AllowPush() {
-  console.log('permisson')
   Notification.requestPermission().then((permission) => {
-    console.log('Permissão:', permission)
-    const base = import.meta.env.BASE_URL || '/'
-
     if (permission === 'granted') {
       navigator.serviceWorker.ready.then((reg) => {
-        reg.showNotification('Notificação ativada!', {
+        reg.showNotification('Notificações ativadas!', {
           body: 'Push testado com sucesso.',
-          icon: `${base}/logo_sticker.png`, // ajusta conforme necessário
         })
       })
-      alert('send')
     } else if (permission === 'denied') {
-      alert('Usuário negou as notificações.')
+      store.commit('alert/setBtn', 'alert')
+      store.commit('alert/setText', 'Dispositivo negou permissão as notificações.')
+      store.commit('alert/setAlert')
     } else {
-      alert('Permissão de notificações não foi concedida.')
+      store.commit('alert/setBtn', 'alert')
+      store.commit('alert/setText', 'Permissão de notificações não foi concedida.')
+      store.commit('alert/setAlert')
     }
   })
-
-  console.log('permisson fim')
 }
 </script>
 
@@ -305,6 +307,10 @@ h2 {
 }
 .button-1 {
   background-color: #b10c06;
+}
+
+.button-5 {
+  background: #348216;
 }
 
 .gap {
