@@ -13,13 +13,16 @@ export default defineConfig(({ mode }) => {
       vue(),
       vueDevTools(),
       VitePWA({
+        strategies: 'injectManifest',
         registerType: 'autoUpdate',
         injectRegister: 'auto',
-        includeAssets: ['logo_dark.png'],
+        includeAssets: ['logo_sticker.png'],
         globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
-
+        filename: 'sw.js',
+        srcDir: 'src',
         devOptions: {
-          enabled: true,
+          enabled: false,
+          type: 'module',
         },
         manifest: {
           name: 'Registos App',
@@ -32,7 +35,7 @@ export default defineConfig(({ mode }) => {
           theme_color: '#181818',
           icons: [
             {
-              src: 'logo_dark.png',
+              src: 'logo_sticker.png',
               sizes: '192x192',
               type: 'image/png',
             },

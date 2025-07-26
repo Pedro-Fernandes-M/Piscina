@@ -574,6 +574,7 @@ const store = createStore({
             localStorage.setItem('logs1', JSON.stringify(dadosLinhas))
           }
           commit('setSpinner', false)
+          await new Promise((resolve) => setTimeout(resolve, 220))
           return true
         } else {
           commit('alert/setBtn', 'alert')

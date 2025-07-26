@@ -1,12 +1,18 @@
 <template>
-  <div class="flex">
+  <div :class="nome ? 'flex' : 'flex-1'">
     <div v-if="nome" class="align-1">
       <h2>{{ greeting() }},</h2>
       <h2>{{ nome.split(' ')[0] }}</h2>
     </div>
     <div :class="[nome ? 'align-2' : 'align']">
-      <h4 :class="[nome ? 'text-right' : '']">{{ temp || '--' }}</h4>
-      <h4 :class="[nome ? 'text-right' : '']">{{ humidity || '--' }}</h4>
+      <div class="center">
+        <IconTemp />
+        <h4 :class="[nome ? 'text-right' : '']">{{ temp || '--' }}</h4>
+      </div>
+      <div class="center">
+        <IconHumidity />
+        <h4 :class="[nome ? 'text-right' : '']">{{ humidity || '--' }}</h4>
+      </div>
     </div>
   </div>
 </template>
@@ -14,6 +20,8 @@
 <script setup>
 import { computed, onBeforeMount } from 'vue'
 import { useStore } from 'vuex'
+import IconTemp from './icons/IconTemp.vue'
+import IconHumidity from './icons/IconHumidity.vue'
 
 const store = useStore()
 
@@ -53,36 +61,38 @@ async function getWeather() {
   const lat = store.getters['defenicoes/getLat']
   const long = store.getters['defenicoes/getLong']
 
-  if (time === null || stamp - time > hora) {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&current=temperature_2m,relative_humidity_2m&timezone=auto&start_date=${dataFormatada}&end_date=${dataFormatada}&format=json&timeformat=unixtime`
+  if (lat && long) {
+    if (time === null || stamp - time > hora) {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&current=temperature_2m,relative_humidity_2m&timezone=auto&start_date=${dataFormatada}&end_date=${dataFormatada}&format=json&timeformat=unixtime`
 
-    try {
-      const response = await fetch(url)
+      try {
+        const response = await fetch(url)
 
-      if (!response.ok) {
-        throw new Error(`Erro na resposta da API: ${response.status}`)
-      }
+        if (!response.ok) {
+          throw new Error(`Erro na resposta da API: ${response.status}`)
+        }
 
-      const data = await response.json()
+        const data = await response.json()
 
-      store.commit('setTemp', data?.current?.temperature_2m + data.current_units?.temperature_2m)
-      store.commit(
-        'setHumidity',
-        data?.current?.relative_humidity_2m + data.current_units?.relative_humidity_2m,
-      )
-      localStorage.setItem('time', JSON.stringify(Date.now()))
-      localStorage.setItem(
-        'temp',
-        JSON.stringify(data?.current?.temperature_2m + data.current_units?.temperature_2m),
-      )
-      localStorage.setItem(
-        'humidity',
-        JSON.stringify(
+        store.commit('setTemp', data?.current?.temperature_2m + data.current_units?.temperature_2m)
+        store.commit(
+          'setHumidity',
           data?.current?.relative_humidity_2m + data.current_units?.relative_humidity_2m,
-        ),
-      )
-    } catch (error) {
-      return error
+        )
+        localStorage.setItem('time', JSON.stringify(Date.now()))
+        localStorage.setItem(
+          'temp',
+          JSON.stringify(data?.current?.temperature_2m + data.current_units?.temperature_2m),
+        )
+        localStorage.setItem(
+          'humidity',
+          JSON.stringify(
+            data?.current?.relative_humidity_2m + data.current_units?.relative_humidity_2m,
+          ),
+        )
+      } catch (error) {
+        return error
+      }
     }
   }
 }
@@ -100,11 +110,20 @@ onBeforeMount(getWeather)
   text-align: justify;
   font-family: Arial, Helvetica, sans-serif;
 }
+.flex-1 {
+  display: grid;
+  width: 100%;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  text-align: justify;
+  font-family: Arial, Helvetica, sans-serif;
+}
 
 .align {
   display: grid;
   align-items: center;
-  justify-content: start;
+  justify-content: end;
+  width: 100%;
   margin-top: 0.25rem;
 }
 .align-1 {
@@ -114,13 +133,21 @@ onBeforeMount(getWeather)
 }
 
 .align-2 {
-  display: grid;
-  align-items: center;
-  justify-content: end;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  justify-content: baseline;
   margin-top: 0.25rem;
 }
 
 .text-right {
   text-align: end;
+}
+
+.center {
+  display: flex;
+  gap: 0.15rem;
+  align-items: center;
+  width: fit-content;
 }
 </style>

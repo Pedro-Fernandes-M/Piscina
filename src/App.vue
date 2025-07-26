@@ -21,7 +21,7 @@
 import { RouterView } from 'vue-router'
 import { useStore } from 'vuex'
 import { previousRoute, router } from './router'
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import AlertCard from './components/AlertCard.vue'
 import SpinnerCard from './components/SpinnerCard.vue'
 import { useRegisterSW } from 'virtual:pwa-register/vue'
@@ -162,11 +162,69 @@ document.addEventListener('visibilitychange', () => {
     }
   }, 1000)
 })
+
+function updateStatus() {
+  store.commit('alert/setBtn', 'alert')
+  store.commit('alert/setText', `Sem Internet. Verifique a ligação!`)
+  store.commit('alert/setAlert')
+}
+onMounted(() => {
+  window.addEventListener('offline', updateStatus)
+})
+
+Notification.requestPermission().then((permission) => {
+  if (permission === 'granted') {
+    console.log('Notifications allowed')
+
+    const base = import.meta.env.BASE_URL || '/'
+
+    function scheduleNotification() {
+      const now = new Date()
+      const next18h = new Date()
+      next18h.setHours(18, 0, 0, 0)
+
+      if (now > next18h) {
+        // Já passou das 18h hoje, agenda para amanhã
+        next18h.setDate(next18h.getDate() + 1)
+      }
+
+      const msUntil18h = next18h - now
+
+      setTimeout(() => {
+        navigator.serviceWorker.getRegistration().then((reg) => {
+          if (reg) {
+            reg.showNotification('Registos', {
+              body: 'Está na hora!',
+              icon: `${base}logo_sticker.png`,
+            })
+          }
+        })
+
+        // Agora agenda para repetir a cada 24h
+        setInterval(
+          () => {
+            navigator.serviceWorker.getRegistration().then((reg) => {
+              if (reg) {
+                reg.showNotification('Registos', {
+                  body: 'Está na hora!',
+                  icon: `${base}logo_sticker.png`,
+                })
+              }
+            })
+          },
+          24 * 60 * 60 * 1000,
+        )
+      }, msUntil18h)
+    }
+
+    scheduleNotification()
+  }
+})
 </script>
 
 <style>
 .fade-slide-enter-active {
-  animation: fadeSlideIn 230ms ease-in forwards;
+  animation: fadeSlideIn 240ms ease-in forwards;
   position: absolute;
   top: 0;
   left: 0;
@@ -175,7 +233,7 @@ document.addEventListener('visibilitychange', () => {
 }
 
 .fade-slide-leave-active {
-  animation: fadeSlideOut 250ms ease-out backwards;
+  animation: fadeSlideOut 260ms ease-out backwards;
   position: absolute;
   top: 0;
   left: 0;

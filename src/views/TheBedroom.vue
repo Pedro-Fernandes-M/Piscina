@@ -292,23 +292,23 @@ async function preencher() {
     ano: new Date().getFullYear(),
     btn: true,
   }
-  if (map.value && !redirect.value) {
-    const newReg = store.getters.getLocal
-    newReg.val = quarto.value
-    if (reg_map.value) {
-      const raw = reg_map.value
-      const reg = JSON.parse(raw)
-      reg.unshift({ id: `${newReg.prop}:${newReg.val}`, timestamp: Date.now() })
-      if (reg.length > 5) reg.length = 5
-      localStorage.setItem('reg_map', JSON.stringify(reg))
-    } else {
-      const write = [{ id: `${newReg.prop}:${newReg.val}`, timestamp: Date.now() }]
-      localStorage.setItem('reg_map', JSON.stringify(write))
-    }
-  }
   try {
     const response = await store.dispatch('preencherSheet', payload)
     if (response.status === 200) {
+      if (map.value && !redirect.value) {
+        const newReg = store.getters.getLocal
+        newReg.val = quarto.value
+        if (reg_map.value) {
+          const raw = reg_map.value
+          const reg = JSON.parse(raw)
+          reg.unshift({ id: `${newReg.prop}:${newReg.val}`, timestamp: Date.now() })
+          if (reg.length > 5) reg.length = 5
+          localStorage.setItem('reg_map', JSON.stringify(reg))
+        } else {
+          const write = [{ id: `${newReg.prop}:${newReg.val}`, timestamp: Date.now() }]
+          localStorage.setItem('reg_map', JSON.stringify(write))
+        }
+      }
       quarto.value = null
       temp_quente.value = null
       cloro_quente.value = null

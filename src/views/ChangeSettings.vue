@@ -14,10 +14,10 @@
       <div class="flex">
         <div class="space" @click="open = !open">
           <span>Avançadas</span>
-          <span v-if="!open">></span>
-          <span v-else class="rotate">></span>
+          <span v-if="!open" class="rotate"><IconDropDown /></span>
+          <span v-else><IconDropDown /></span>
         </div>
-        <transition name="dropdown">
+        <transition name="dropdown" mode="out-in">
           <div class="flex-1" v-if="open">
             <button :class="[mapa != null ? 'button-2' : 'button-4']" @click="upload">
               <div v-if="mapa != null" class="span"><IconReUpload /> Alterar Mapa</div>
@@ -59,6 +59,7 @@
 </template>
 
 <script setup>
+import IconDropDown from '@/components/icons/IconDropDown.vue'
 import IconReUpload from '@/components/icons/IconReUpload.vue'
 import IconUpload from '@/components/icons/IconUpload.vue'
 import { router } from '@/router'
@@ -325,13 +326,13 @@ h2 {
   width: 100%;
 }
 .rotate {
-  rotate: 90deg;
+  rotate: -90deg;
 }
 
 /* Transição para altura suave */
 .dropdown-enter-active,
 .dropdown-leave-active {
-  transition: all 0.4s ease-in-out;
+  transition: all 0.5s ease-in-out;
   max-height: 200px;
   opacity: 1;
 }
