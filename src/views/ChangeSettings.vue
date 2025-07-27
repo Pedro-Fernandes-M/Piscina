@@ -40,7 +40,10 @@
               />
             </div>
             <div>
-              <button @click="AllowPush" :class="[pushEnable ? 'button-2 ' : 'button-4 button-5']">
+              <button
+                @click="AllowPush"
+                :class="[pushEnable === 'granted' ? 'button-2 ' : 'button-5']"
+              >
                 Enable Notifications
               </button>
             </div>
@@ -77,8 +80,9 @@ onMounted(() => {
   store.commit('setPage', 'settings')
 })
 
-const pushEnable = computed(() => {
-  return 'Notification' in window && Notification.permission === 'granted'
+const pushEnable = ref(false)
+Notification.requestPermission().then((permission) => {
+  pushEnable.value = permission
 })
 
 const settigns = [
@@ -199,6 +203,7 @@ function handleFile(event) {
 
 function AllowPush() {
   Notification.requestPermission().then((permission) => {
+    pushEnable.value = permission
     if (permission === 'granted') {
       navigator.serviceWorker.ready.then((reg) => {
         reg.showNotification('Notificações ativadas!', {
@@ -310,7 +315,15 @@ h2 {
 }
 
 .button-5 {
-  background: #348216;
+  width: 100%;
+  background-color: #348216;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
 }
 
 .gap {
