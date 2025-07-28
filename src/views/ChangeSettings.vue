@@ -76,13 +76,17 @@ import { useStore } from 'vuex'
 
 const store = useStore()
 
+const pushEnable = ref(false)
+
 onMounted(() => {
   store.commit('setPage', 'settings')
-})
-
-const pushEnable = ref(false)
-Notification.requestPermission().then((permission) => {
-  pushEnable.value = permission
+  if (JSON.parse(localStorage.getItem('push')) === 'granted')
+    Notification.requestPermission().then((permission) => {
+      pushEnable.value = permission
+    })
+  else {
+    pushEnable.value = false
+  }
 })
 
 const settigns = [
@@ -97,7 +101,6 @@ const settigns = [
 store.dispatch('defenicoes/getSettings')
 
 const mapa = computed(() => {
-  console.lo
   return store.getters.getMapa
 })
 
@@ -204,6 +207,8 @@ function handleFile(event) {
 function AllowPush() {
   Notification.requestPermission().then((permission) => {
     pushEnable.value = permission
+    localStorage.setItem('push', JSON.stringify(permission))
+
     if (permission === 'granted') {
       navigator.serviceWorker.ready.then((reg) => {
         reg.showNotification('Notificações ativadas!', {

@@ -80,20 +80,62 @@ const defenicoes = {
       commit('setMapa', mapa, { root: true })
       dispatch('setSettings', settings)
     },
-    cache({ commit }) {
-      commit('setGoogleCredential', null, { root: true })
-      localStorage.removeItem('token')
-      localStorage.removeItem('logs')
-      localStorage.removeItem('logs1')
-      localStorage.removeItem('logs2')
-      localStorage.removeItem('reg_map')
-      if ('caches' in window) {
-        caches.keys().then((names) => {
-          for (let name of names) {
-            caches.delete(name)
-          }
+    async cache({ commit }, payload) {
+      if (payload === 'default') {
+        commit('setGoogleCredential', null, { root: true })
+        localStorage.removeItem('token')
+        localStorage.removeItem('logs')
+        localStorage.removeItem('logs1')
+        localStorage.removeItem('logs2')
+
+        const cacheKeys = await caches.keys()
+        for (const key of cacheKeys) {
+          await caches.delete(key)
+        }
+        const regs = await navigator.serviceWorker.getRegistrations()
+        for (const reg of regs) {
+          await reg.unregister()
+        }
+
+        sessionStorage.clear()
+      } else if (payload === 'extreme') {
+        commit('setGoogleCredential', null, { root: true })
+
+        const cacheKeys = await caches.keys()
+        for (const key of cacheKeys) {
+          await caches.delete(key)
+        }
+        const regs = await navigator.serviceWorker.getRegistrations()
+        for (const reg of regs) {
+          await reg.unregister()
+        }
+
+        document.cookie.split(';').forEach((cookie) => {
+          const name = cookie.split('=')[0].trim()
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`
         })
+        localStorage.clear()
+        sessionStorage.clear()
+      } else if (payload === 'basic') {
+        commit('setGoogleCredential', null, { root: true })
+        localStorage.removeItem('token')
+        localStorage.removeItem('logs')
+        localStorage.removeItem('logs1')
+        localStorage.removeItem('logs2')
+
+        const cacheKeys = await caches.keys()
+        for (const key of cacheKeys) {
+          await caches.delete(key)
+        }
       }
+      commit('alert/setBtn', 'alert', { root: true })
+      commit(
+        'alert/setText',
+        `Reset concluído. Será agora efetuado um refresh! No entanto e recomendado reiniciar a app.`,
+        { root: true },
+      )
+      commit('alert/setAlert', undefined, { root: true })
+
       return true
     },
   },

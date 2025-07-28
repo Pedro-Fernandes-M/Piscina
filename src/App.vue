@@ -140,7 +140,7 @@ watch(needRefresh, (val) => {
     update.value = true
     store.commit('alert/setResponse', null)
     store.commit('alert/setBtn', 'confirm')
-    store.commit('alert/setText', `Nova atualização disponível, pretende atualizar?`)
+    store.commit('alert/setText', `Nova atualização disponível, aplicação vai ser atualizada!`)
     store.commit('alert/setAlert')
   }
 })

@@ -12,7 +12,7 @@
       <h2>Locais</h2>
     </button>
     <div class="bottom">
-      <IconSettings @click="router.push('/settings')" class="rotate"></IconSettings>
+      <IconSettings @click.stop="router.push('/settings')" class="rotate"></IconSettings>
     </div>
   </div>
 </template>
