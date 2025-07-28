@@ -129,11 +129,7 @@ const defenicoes = {
         }
       }
       commit('alert/setBtn', 'alert', { root: true })
-      commit(
-        'alert/setText',
-        `Reset concluído. Será agora efetuado um refresh! No entanto e recomendado reiniciar a app.`,
-        { root: true },
-      )
+      commit('alert/setText', `Reset concluído. É recomendado reiniciar a app.`, { root: true })
       commit('alert/setAlert', undefined, { root: true })
 
       return true

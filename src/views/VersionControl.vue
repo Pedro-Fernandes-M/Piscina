@@ -77,12 +77,6 @@ async function reset() {
     show.value = false
   }
 }
-
-watch(alert, (novo) => {
-  if ((novo === false) & ok.value) {
-    window.location.reload()
-  }
-})
 </script>
 
 <style scoped>
