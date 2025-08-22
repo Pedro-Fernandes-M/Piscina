@@ -43,9 +43,6 @@ const mode = ref('')
 const response = computed(() => {
   return store.getters['alert/getResponse']
 })
-const alert = computed(() => {
-  return store.getters['alert/getAlert']
-})
 
 const ok = ref(false)
 
