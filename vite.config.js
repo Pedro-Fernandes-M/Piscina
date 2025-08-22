@@ -18,6 +18,7 @@ export default defineConfig(({ mode }) => {
         injectRegister: 'auto',
         includeAssets: ['logo_sticker.png'],
         globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+        cleanupOutdatedCaches: true,
         filename: 'sw.js',
         srcDir: 'src',
         devOptions: {
