@@ -167,8 +167,8 @@ const start = async () => {
   store.commit('setPage', 'table')
   if (redirect.value) {
     dispatch.value = await store.dispatch('lerPlanilha', {
-      dia: day,
-      mes: new Date().getMonth() + 1,
+      dia: String(day).padStart(2, '0'),
+      mes: String(new Date().getMonth() + 1).padStart(2, '0'),
       ano: new Date().getFullYear(),
       options: 'quartos',
     })

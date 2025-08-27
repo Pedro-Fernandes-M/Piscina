@@ -3,14 +3,18 @@
     <div class="top">
       <OpenGreeting></OpenGreeting>
     </div>
-    <button @click="setPage(true)">
-      <IconPiscina class="margin"></IconPiscina>
-      <h2>Piscinas</h2>
-    </button>
-    <button @click="setPage(false)" class="button4">
-      <IconEspacos class="margin"></IconEspacos>
-      <h2>Locais</h2>
-    </button>
+    <div>
+      <div class="center gap">
+        <button @click="setPage(1)">
+          <IconPiscina class="margin"></IconPiscina>
+          <h2>Piscinas</h2>
+        </button>
+        <button @click="setPage(2)" class="button4">
+          <IconEspacos class="margin"></IconEspacos>
+          <h2>Locais</h2>
+        </button>
+      </div>
+    </div>
     <div class="bottom">
       <IconSettings @click.stop="router.push('/settings')" class="rotate"></IconSettings>
     </div>
@@ -24,16 +28,18 @@ import { router } from '@/router'
 import { useStore } from 'vuex'
 import IconSettings from '@/components/icons/IconSettings.vue'
 import OpenGreeting from '@/components/OpenGreeting.vue'
+import { onMounted, ref } from 'vue'
 
 const store = useStore()
+const display = ref(null)
 
 store.commit('setPage', 'home')
 
 function setPage(page) {
-  if (page) {
+  if (page == 1) {
     router.push('/piscina')
     store.commit('setPage', 'piscina')
-  } else {
+  } else if (page == 2) {
     router.push('/quartos')
     store.commit('setPage', 'quartos')
   }
@@ -60,6 +66,10 @@ button {
   background: #c49c27;
 }
 
+.button5 {
+  background: #228b22;
+}
+
 h2 {
   font-weight: 600;
 }
@@ -74,7 +84,7 @@ h2 {
   align-items: center;
   min-height: 100dvh;
   position: absolute;
-  width: 99dvw;
+  width: 100%;
 }
 
 .margin {
@@ -98,5 +108,12 @@ h2 {
   top: 0;
   padding-top: 1.2rem;
   width: 100%;
+}
+
+.center {
+  display: flex;
+  width: 100dvw;
+  justify-content: center;
+  align-items: center;
 }
 </style>

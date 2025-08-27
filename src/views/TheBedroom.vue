@@ -96,8 +96,8 @@
 </template>
 
 <script setup>
-import IconBack from '@/components/icons/IconBack.vue'
 import RandomMap from '@/components/RandomMap.vue'
+import IconBack from '@/components/icons/IconBack.vue'
 import { previousRoute, router } from '@/router'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
@@ -159,8 +159,10 @@ const monthNames = [
 ]
 const month = new Date().getMonth() + 1
 const monthN = monthNames[month - 1]
+let diaFormatado = String(day).padStart(2, '0')
+let mesFormatado = String(month).padStart(2, '0')
 
-let data = day + '/' + month
+let data = diaFormatado + '/' + mesFormatado
 const quarto = ref(null)
 const temp_quente = ref(null)
 const cloro_quente = ref(null)
