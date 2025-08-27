@@ -28,10 +28,8 @@ import { router } from '@/router'
 import { useStore } from 'vuex'
 import IconSettings from '@/components/icons/IconSettings.vue'
 import OpenGreeting from '@/components/OpenGreeting.vue'
-import { onMounted, ref } from 'vue'
 
 const store = useStore()
-const display = ref(null)
 
 store.commit('setPage', 'home')
 
